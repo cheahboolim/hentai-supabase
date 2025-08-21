@@ -16,7 +16,7 @@
       <a href="/p/upload" class="hover:underline">Upload</a>
       <a href="https://tally.so/r/waXOeB" target="_blank" class="hover:underline">DMCA</a>
       <a href="https://tally.so/r/3Eervr" target="_blank" class="hover:underline">Suggestions</a>
-      <a href="/" class="hover:underline">SUSMANGA.COM</a>
+      <a href="/" class="hover:underline">NHENTAI.PICS</a>
     </div>
   </div>
 
