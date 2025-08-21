@@ -13,7 +13,7 @@
 	<div class="bg-black dark:bg-grey-800 rounded-lg shadow-lg p-6 mb-8">
 		<div class="flex items-center justify-between mb-4">
 			<h3 class="text-lg font-bold text-gray-900 dark:text-white">
-				🔥 Hot now on Susmanga.com
+				🔥 Hot now on nHentai
 			</h3>
 		</div>
 		

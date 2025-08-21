@@ -107,31 +107,31 @@ export const load: PageServerLoad = async ({ params, url }) => {
 
 	// Enhanced SEO data
 	const typeLabel = typeLabels[type] || type;
-	const currentUrl = `https://susmanga.com${url.pathname}${url.search}`;
+	const currentUrl = `https://nhentai.pics${url.pathname}${url.search}`;
 	const canonicalUrl = page === 1 ? 
-		`https://susmanga.com/browse/${type}/${slug}` : 
-		`https://susmanga.com/browse/${type}/${slug}?page=${page}`;
+		`https://nhentai.pics/browse/${type}/${slug}` : 
+		`https://nhentai.pics/browse/${type}/${slug}?page=${page}`;
 
 	// Generate dynamic descriptions based on type
 	const generateDescription = () => {
 		const pageInfo = page > 1 ? ` - Page ${page}` : '';
 		switch (type) {
 			case 'tags':
-				return `Browse ${totalManga} manga with ${meta.name} tag${pageInfo}. Find doujinshi and hentai manga featuring ${meta.name.toLowerCase()} content.`;
+				return `Browse ${totalManga} hentai with ${meta.name} tag${pageInfo}. Find doujinshi and hentai manga featuring ${meta.name.toLowerCase()} content.`;
 			case 'artists':
-				return `Discover ${totalManga} manga by artist ${meta.name}${pageInfo}. Read all works from this talented manga creator.`;
+				return `Discover ${totalManga} hentai by artist ${meta.name}${pageInfo}. Read all works from this talented hentai creator.`;
 			case 'parodies':
-				return `Read ${totalManga} ${meta.name} parody manga${pageInfo}. Fan-made doujinshi and adult content based on ${meta.name}.`;
+				return `Read ${totalManga} ${meta.name} parody hentai${pageInfo}. Fan-made doujinshi and adult content based on ${meta.name}.`;
 			case 'characters':
-				return `Find ${totalManga} manga featuring ${meta.name}${pageInfo}. Browse doujinshi with this popular character.`;
+				return `Find ${totalManga} hentai featuring ${meta.name}${pageInfo}. Browse doujinshi with this popular character.`;
 			case 'categories':
-				return `Explore ${totalManga} manga in ${meta.name} category${pageInfo}. Discover content in this genre.`;
+				return `Explore ${totalManga} hentai in ${meta.name} category${pageInfo}. Discover content in this genre.`;
 			case 'languages':
-				return `Read ${totalManga} manga in ${meta.name}${pageInfo}. Browse content in your preferred language.`;
+				return `Read ${totalManga} hentai in ${meta.name}${pageInfo}. Browse content in your preferred language.`;
 			case 'groups':
-				return `Browse ${totalManga} manga by ${meta.name} group${pageInfo}. Quality translations and releases.`;
+				return `Browse ${totalManga} hentai by ${meta.name} group${pageInfo}. Quality translations and releases.`;
 			default:
-				return `Browse ${totalManga} manga in ${meta.name}${pageInfo}.`;
+				return `Browse ${totalManga} hentai in ${meta.name}${pageInfo}.`;
 		}
 	};
 
@@ -146,8 +146,8 @@ export const load: PageServerLoad = async ({ params, url }) => {
 		typeLabel,
 		seo: {
 			title: page === 1 ? 
-				`${meta.name} ${typeLabel} - ${totalManga} Manga | SusManga` :
-				`${meta.name} ${typeLabel} - Page ${page} of ${totalPages} | SusManga`,
+				`${meta.name} ${typeLabel} - ${totalManga} Manga | nHentai` :
+				`${meta.name} ${typeLabel} - Page ${page} of ${totalPages} | nHentai`,
 			description: generateDescription(),
 			canonical: canonicalUrl,
 			keywords: `${meta.name.toLowerCase()}, ${type}, manga, doujinshi, hentai, adult manga, ${meta.name.toLowerCase()} manga`,

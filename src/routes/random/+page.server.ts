@@ -95,11 +95,11 @@ export const load: PageServerLoad = async ({ url }) => {
 		seed, // Include seed for consistent pagination
 		meta: {
 			title: isFirstPage
-				? 'Random Manga | Discover New Comics | SusManga'
-				: `Random Manga | Page ${page} | SusManga`,
+				? 'Random Hentai | Discover New Comics | nHentai'
+				: `Random Hentai | Page ${page} | nHentai`,
 			description: isFirstPage
-				? 'Discover random manga and doujinshi on SusManga. Find new comics you might have missed!'
-				: `Browse page ${page} of random manga selections. Discover new adult comics randomly.`,
+				? 'Discover random Hentai and doujinshi on nHentai. Find new comics you might have missed!'
+				: `Browse page ${page} of random Hentai selections. Discover new adult comics randomly.`,
 			prev: page > 1 ? `/random?page=${page - 1}&seed=${seed}` : null,
 			next: page < totalPages ? `/random?page=${page + 1}&seed=${seed}` : null
 		}

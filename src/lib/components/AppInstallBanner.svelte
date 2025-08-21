@@ -143,7 +143,7 @@
 		</button>
 		
 		<div class="content">
-			<h2 class="title">❤️ Love SusManga? Get our app!</h2>
+			<h2 class="title">❤️ Love nHentai? Get our app!</h2>
 			<p class="subtitle">Download app for {os}</p>
 
 			{#if canInstall}

@@ -6,7 +6,7 @@
   <div class="container flex flex-col md:flex-row md:items-center md:justify-between gap-4">
     <!-- Text -->
     <p class="text-center md:text-left leading-loose">
-      &copy; {year} SusManga. All rights reserved.
+      &copy; {year} nHentai. All rights reserved.
     </p>
 
     <!-- Links -->

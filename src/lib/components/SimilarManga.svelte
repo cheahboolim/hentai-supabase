@@ -130,7 +130,7 @@
 
 {#if !loading && similarManga.length > 0}
   <section class="mt-12 px-4">
-    <h2 class="text-2xl font-bold mb-6">Similar Manga</h2>
+    <h2 class="text-2xl font-bold mb-6">Similar Hentai</h2>
     
     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
       {#each similarManga as manga (manga.id)}
@@ -194,7 +194,7 @@
   </section>
 {:else if loading}
   <section class="mt-12 px-4">
-    <h2 class="text-2xl font-bold mb-6">Similar Manga</h2>
+    <h2 class="text-2xl font-bold mb-6">Similar Hentai</h2>
     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
       {#each Array(8) as _}
         <div class="bg-card overflow-hidden rounded-lg shadow animate-pulse">
@@ -209,7 +209,7 @@
   </section>
 {:else if error}
   <section class="mt-12 px-4">
-    <h2 class="text-2xl font-bold mb-6">Similar Manga</h2>
+    <h2 class="text-2xl font-bold mb-6">Similar Hentai</h2>
     <div class="text-center py-8">
       <p class="text-red-500 mb-4">{error}</p>
       <button 

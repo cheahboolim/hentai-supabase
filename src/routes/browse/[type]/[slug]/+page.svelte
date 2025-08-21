@@ -84,7 +84,7 @@
   
   <!-- Additional SEO -->
   <meta name="robots" content="index, follow" />
-  <meta name="author" content="SusManga" />
+  <meta name="author" content="nHentai Pics" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <!-- Pagination SEO -->

@@ -74,8 +74,8 @@
 					<!-- Logo -->
 					<div class="flex-shrink-0 min-w-0">
 						<a href="/" class="font-bold text-base sm:text-lg text-foreground truncate">
-							<span class="block sm:hidden">SM</span>
-							<span class="hidden sm:block">SUSMANGA.COM</span>
+							<span class="block sm:hidden">N.PICS</span>
+							<span class="hidden sm:block">NHENTAI.PICS</span>
 						</a>
 					</div>
 
@@ -116,7 +116,7 @@
 					<!-- Logo -->
 					<div class="flex-shrink-0">
 						<a href="/" class="font-bold text-xl lg:text-2xl text-foreground">
-							SUSMANGA.COM
+							NHENTAI.PICS
 						</a>
 					</div>
 
@@ -126,7 +126,7 @@
 							<input
 								type="search"
 								bind:value={search}
-								placeholder="Search SusManga.com"
+								placeholder="Search NHENTAI.PICS"
 								class="w-full rounded-full text-sm placeholder:text-gray-400 bg-[#343434] text-white px-4 py-2 pr-12 border border-white/20 focus:border-white/40 focus:outline-none transition-colors"
 							/>
 							<button
@@ -207,7 +207,7 @@
 						<input
 							type="search"
 							bind:value={search}
-							placeholder="Search SusManga.com"
+							placeholder="Search NHENTAI.PICS"
 							class="w-full rounded-lg text-base placeholder:text-gray-400 bg-[#343434] text-white px-4 py-3 pr-12 border border-white/20 focus:border-white/40 focus:outline-none transition-colors"
 						/>
 						<button

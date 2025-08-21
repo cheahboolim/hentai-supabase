@@ -28,7 +28,7 @@
 	<meta property="og:image:height" content="630" />
 	<meta property="og:image:type" content="image/jpeg" />
 	<meta property="og:url" content="https://s.susmanga.com" />
-	<meta property="og:site_name" content="SusManga" />
+	<meta property="og:site_name" content="nHentai" />
 	
 	<!-- Twitter Card -->
 	<meta name="twitter:card" content="summary_large_image" />
