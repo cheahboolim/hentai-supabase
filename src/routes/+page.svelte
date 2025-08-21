@@ -27,7 +27,7 @@
 	<meta property="og:image:width" content="1200" />
 	<meta property="og:image:height" content="630" />
 	<meta property="og:image:type" content="image/jpeg" />
-	<meta property="og:url" content="https://s.susmanga.com" />
+	<meta property="og:url" content="https://nhentai.pics" />
 	<meta property="og:site_name" content="nHentai" />
 	
 	<!-- Twitter Card -->

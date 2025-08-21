@@ -9,8 +9,8 @@ export default defineConfig({
 			registerType: 'autoUpdate',
 			includeAssets: ['favicon.ico', 'pwa-icon-192.png', 'pwa-icon-512.png'],
 			manifest: {
-				name: 'SusManga',
-				short_name: 'Manga',
+				name: 'NHentai',
+				short_name: 'NHentai',
 				start_url: '/?utm_source=pwa&utm_medium=pwa&utm_campaign=install',
 				display: 'standalone',
 				background_color: '#000000',

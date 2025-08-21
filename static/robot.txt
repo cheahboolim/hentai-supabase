@@ -1,5 +1,2 @@
 User-agent: *
-Disallow:
-
-Sitemap: https://susmanga.com/sitemap.xml
-Sitemap: https://susmanga.com/sitemap-browse.xml
+Disallow: /

@@ -1,7 +1,7 @@
 {
-  "name": "SusManga",
-  "short_name": "SusManga",
-  "description": "SusManga.com - Share Your Dreams, Live Your Fantasy",
+  "name": "NhentaiPics",
+  "short_name": "NhentaiPics",
+  "description": "NhentaiPics.com - Share Your Dreams, Live Your Fantasy",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0d1117",

@@ -8,6 +8,7 @@
 
   <a
     id="frame-link"
+    title="Ads"
     href="https://aads.com/campaigns/new/?source_id=2401977&source_type=ad_unit&partner=2401977"
     class="text-xs text-right mt-1 text-gray-400 hover:text-white transition"
     target="_blank"
