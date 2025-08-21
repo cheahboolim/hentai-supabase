@@ -120,7 +120,7 @@
   }
 
   function navigateToManga(slug: string) {
-    window.location.href = `/comic/${slug}`;
+    window.location.href = `/hentai/${slug}`;
   }
 
   onMount(() => {
