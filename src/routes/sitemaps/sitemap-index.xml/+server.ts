@@ -26,11 +26,11 @@ export async function GET() {
     // Define static sitemaps
     const sitemaps = [
       {
-        loc: `${SITE_URL}/sitemap-static.xml`,
+        loc: `${SITE_URL}/sitemaps/sitemap-static.xml`,
         lastmod: new Date().toISOString().split('T')[0]
       },
       {
-        loc: `${SITE_URL}/sitemap-browse.xml`,
+        loc: `${SITE_URL}/sitemaps/sitemap-browse.xml`,
         lastmod: new Date().toISOString().split('T')[0]
       }
     ];
@@ -38,7 +38,7 @@ export async function GET() {
     // Add manga gallery sitemaps
     for (let i = 0; i < mangaSitemapCount; i++) {
       sitemaps.push({
-        loc: `${SITE_URL}/sitemap-manga-galleries-${i}.xml`,
+        loc: `${SITE_URL}/sitemaps/sitemap-manga-galleries-${i}.xml`,
         lastmod: new Date().toISOString().split('T')[0]
       });
     }
@@ -46,7 +46,7 @@ export async function GET() {
     // Add manga page sitemaps
     for (let i = 0; i < pageSitemapCount; i++) {
       sitemaps.push({
-        loc: `${SITE_URL}/sitemap-manga-pages-${i}.xml`,
+        loc: `${SITE_URL}/sitemaps/sitemap-manga-pages-${i}.xml`,
         lastmod: new Date().toISOString().split('T')[0]
       });
     }
