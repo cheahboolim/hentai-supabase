@@ -16,9 +16,9 @@ export const load: PageServerLoad = async ({ locals, url }) => {
       totalTags: 0,
       availableLetters: [],
       seo: {
-        title: 'Browse Manga Tags | SusManga',
-        description: 'Browse manga tags and categories',
-        canonical: `https://susmanga.com${url.pathname}`
+        title: 'Browse Manga Tags | NHentai',
+        description: 'Browse hentai tags and categories',
+        canonical: `https://nhentai.pics${url.pathname}`
       }
     };
   }

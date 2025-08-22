@@ -35,19 +35,19 @@ export const load: PageServerLoad = async ({ locals, url }) => {
     totalParodies,
     availableLetters,
     seo: {
-      title: `Browse ${totalParodies}+ Manga Parodies A-Z | SusManga`,
+      title: `Browse ${totalParodies}+ Hentai Parodies A-Z | NHentai`,
       description: `Discover manga parodies from ${availableLetters.join(', ')}. Find Naruto, One Piece, Dragon Ball, Attack on Titan, and ${totalParodies - 4}+ more anime, game, and comic parodies.`,
       canonical: `https://susmanga.com${url.pathname}`,
       keywords: 'manga parodies, anime parodies, doujinshi, hentai manga, comic parodies, game parodies, ' + popularParodies.toLowerCase(),
       ogTitle: `${totalParodies}+ Manga Parodies | Browse A-Z`,
       ogDescription: `Complete collection of manga parodies organized alphabetically. Find your favorite anime, game, and comic parodies.`,
-      ogImage: 'https://susmanga.com/images/parodies-og.jpg',
+      ogImage: 'https://nhentai.pics/images/parodies-og.jpg',
       structuredData: {
         '@context': 'https://schema.org',
         '@type': 'CollectionPage',
         name: 'Manga Parodies Collection',
-        description: `Browse our complete collection of ${totalParodies} manga parodies organized alphabetically`,
-        url: `https://susmanga.com${url.pathname}`,
+        description: `Browse our complete collection of ${totalParodies} hentai parodies organized alphabetically`,
+        url: `https://nhentai.pics${url.pathname}`,
         mainEntity: {
           '@type': 'ItemList',
           numberOfItems: totalParodies,
