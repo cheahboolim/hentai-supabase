@@ -8,18 +8,6 @@ interface SitemapUrl {
   priority?: string;
 }
 
-function generateSitemapXML(urls: SitemapUrl[]): string {
-  return `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${urls.map(url => `  <url>
-    <loc>${url.loc}</loc>
-    ${url.lastmod ? `<lastmod>${url.lastmod}</lastmod>` : ''}
-    ${url.changefreq ? `<changefreq>${url.changefreq}</changefreq>` : ''}
-    ${url.priority ? `<priority>${url.priority}</priority>` : ''}
-  </url>`).join('\n')}
-</urlset>`;
-}
-
 export async function GET() {
   const urls: SitemapUrl[] = [
     {
@@ -36,36 +24,43 @@ export async function GET() {
     },
     {
       loc: `${SITE_URL}/p/tags`,
+      lastmod: new Date().toISOString().split('T')[0],
       changefreq: 'weekly',
       priority: '0.7'
     },
     {
       loc: `${SITE_URL}/p/artists`,
+      lastmod: new Date().toISOString().split('T')[0],
       changefreq: 'weekly',
       priority: '0.7'
     },
     {
       loc: `${SITE_URL}/p/categories`,
+      lastmod: new Date().toISOString().split('T')[0],
       changefreq: 'weekly',
       priority: '0.7'
     },
     {
       loc: `${SITE_URL}/p/parodies`,
+      lastmod: new Date().toISOString().split('T')[0],
       changefreq: 'weekly',
       priority: '0.7'
     },
     {
       loc: `${SITE_URL}/p/characters`,
+      lastmod: new Date().toISOString().split('T')[0],
       changefreq: 'weekly',
       priority: '0.7'
     },
     {
       loc: `${SITE_URL}/p/languages`,
+      lastmod: new Date().toISOString().split('T')[0],
       changefreq: 'weekly',
       priority: '0.7'
     },
     {
       loc: `${SITE_URL}/p/groups`,
+      lastmod: new Date().toISOString().split('T')[0],
       changefreq: 'weekly',
       priority: '0.7'
     }
@@ -76,7 +71,19 @@ export async function GET() {
   return new Response(sitemap, {
     headers: {
       'Content-Type': 'application/xml',
-      'Cache-Control': 'max-age=86400' // Cache for 24 hours
+      'Cache-Control': 'max-age=3600'
     }
   });
+}
+
+function generateSitemapXML(urls: SitemapUrl[]): string {
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls.map(url => `  <url>
+    <loc>${url.loc}</loc>
+    ${url.lastmod ? `<lastmod>${url.lastmod}</lastmod>` : ''}
+    ${url.changefreq ? `<changefreq>${url.changefreq}</changefreq>` : ''}
+    ${url.priority ? `<priority>${url.priority}</priority>` : ''}
+  </url>`).join('\n')}
+</urlset>`;
 }

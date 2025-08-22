@@ -1,7 +1,8 @@
-// src/routes/sitemap-browse.xml/+server.ts
+// src/routes/sitemap-manga-galleries-[index]/+server.ts
 import { supabase } from '$lib/supabaseClient';
 
 const SITE_URL = 'https://nhentai.pics';
+const URLS_PER_SITEMAP = 50000;
 
 interface SitemapUrl {
   loc: string;
@@ -10,37 +11,39 @@ interface SitemapUrl {
   priority?: string;
 }
 
-export async function GET() {
-  const urls: SitemapUrl[] = [];
+export async function GET({ params }) {
+  const index = parseInt(params.index, 10);
+  if (isNaN(index)) {
+    return new Response('Invalid index', { status: 400 });
+  }
 
   try {
-    const browseQueries = [
-      { table: 'tags', type: 'tags', limit: 5000 },
-      { table: 'artists', type: 'artists', limit: 5000 },
-      { table: 'categories', type: 'categories', limit: 500 },
-      { table: 'parodies', type: 'parodies', limit: 5000 },
-      { table: 'characters', type: 'characters', limit: 5000 },
-      { table: 'languages', type: 'languages', limit: 500 },
-      { table: 'groups', type: 'groups', limit: 5000 }
-    ];
+    const { data: mangaData } = await supabase
+      .from('slug_map')
+      .select(`
+        slug,
+        manga_id,
+        manga!inner(created_at)
+      `)
+      .not('slug', 'is', null)
+      .neq('slug', '')
+      .range(index * URLS_PER_SITEMAP, (index + 1) * URLS_PER_SITEMAP - 1);
 
-    for (const query of browseQueries) {
-      const { data } = await supabase
-        .from(query.table)
-        .select('slug')
-        .not('slug', 'is', null)
-        .neq('slug', '')
-        .limit(query.limit);
+    const urls: SitemapUrl[] = [];
 
-      if (data) {
-        for (const item of data) {
-          urls.push({
-            loc: `${SITE_URL}/browse/${query.type}/${item.slug}`,
-            lastmod: new Date().toISOString().split('T')[0],
-            changefreq: 'weekly',
-            priority: '0.6'
-          });
-        }
+    if (mangaData) {
+      for (const item of mangaData) {
+        const manga = item.manga as any;
+        const lastmod = manga?.created_at
+          ? new Date(manga.created_at).toISOString().split('T')[0]
+          : new Date().toISOString().split('T')[0];
+
+        urls.push({
+          loc: `${SITE_URL}/hentai/${item.slug}`,
+          lastmod,
+          changefreq: 'monthly',
+          priority: '0.5'
+        });
       }
     }
 
@@ -53,7 +56,7 @@ export async function GET() {
       }
     });
   } catch (error) {
-    console.error('Browse sitemap error:', error);
+    console.error(`Manga galleries sitemap ${index} error:`, error);
     return new Response(generateSitemapXML([]), {
       headers: {
         'Content-Type': 'application/xml',
