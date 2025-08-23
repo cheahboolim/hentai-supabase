@@ -49,7 +49,7 @@ export const load: PageServerLoad = async ({ url, locals }) => {
 	const meta = {
 		title:
 			page > 1
-				? `Search results for "${query}" – Page ${page} | nHentai.Pics`
+				? `Search results for "${query}" – Page ${page} | nHentai.pics
 				: `Search results for "${query}" | nHentai`,
 		description: `Discover Hentai results for "${query}" on nHentai. Page ${page} of ${totalPages}.`,
 		prev: page > 1 ? `/search?q=${encodeURIComponent(query)}&page=${page - 1}` : null,

@@ -4,7 +4,7 @@ import { writable } from 'svelte/store';
 export const seo = writable({
 	title: 'NHentai - Read Hentai, Doujinshi, and Manga Free',
 	description: 'nhentai.pics - Share Your Dreams, Live Your Fantasy',
-	canonical: '`https://nhentai.pics`',
+	canonical: '`https://nhentai.pics',
 	keywords: 'hentai, doujinshi, manga, adult manga, free manga, read online, anime',
 	ogTitle: 'NHentai - Read Hentai, Doujinshi, and Manga Free',
 	ogDescription: 'nhentai.pics - Share Your Dreams, Live Your Fantasy',

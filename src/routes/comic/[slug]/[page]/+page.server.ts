@@ -146,7 +146,7 @@ export async function load({ params, url: _url }) {
     : `Continue reading ${baseTitle} - Page ${pageNum} at NHentai. Free online manga reader with high quality images and fast loading.`;
 
   // Canonical URL
-  const canonical = `https://nhentai.pics`/comic/${slug}/${pageNum}`;
+  const canonical = `https://nhentai.pics/comic/${slug}/${pageNum}`;
 
   // Pagination links
   const prev = pageNum > 1
@@ -166,14 +166,14 @@ export async function load({ params, url: _url }) {
     "@type": "ComicSeries",
     "name": manga.title,
     "description": seoDescription,
-    "url": `https://nhentai.pics`/comic/${slug}`,
+    "url": `https://nhentai.pics/comic/${slug}`,
     "image": ogImage,
     "genre": tagNames,
     "numberOfEpisodes": totalPages,
     "publisher": {
       "@type": "Organization",
       "name": siteTitle,
-      "url": "`https://nhentai.pics`"
+      "url": "`https://nhentai.pics"
     }
   };
 

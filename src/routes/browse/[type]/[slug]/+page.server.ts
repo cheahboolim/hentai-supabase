@@ -153,7 +153,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
 			keywords: `${meta.name.toLowerCase()}, ${type}, manga, doujinshi, hentai, adult manga, ${meta.name.toLowerCase()} manga`,
 			ogTitle: `${meta.name} ${typeLabel} - ${totalManga} Manga`,
 			ogDescription: generateDescription(),
-			ogImage: comics[0]?.featureImage || '`https://nhentai.pics`/images/browse-og.jpg',
+			ogImage: comics[0]?.featureImage || '`https://nhentai.pics/images/browse-og.jpg',
 			structuredData: {
 				'@context': 'https://schema.org',
 				'@type': 'CollectionPage',
@@ -168,9 +168,9 @@ export const load: PageServerLoad = async ({ params, url }) => {
 						position: (page - 1) * PAGE_SIZE + index + 1,
 						item: {
 							'@type': 'Book',
-							'@id': `https://nhentai.pics`/comic/${comic.slug}`,
+							'@id': `https://nhentai.pics/comic/${comic.slug}`,
 							name: comic.title,
-							url: `https://nhentai.pics`/comic/${comic.slug}`,
+							url: `https://nhentai.pics/comic/${comic.slug}`,
 							image: comic.featureImage,
 							author: {
 								'@type': 'Person',
@@ -186,19 +186,19 @@ export const load: PageServerLoad = async ({ params, url }) => {
 							'@type': 'ListItem',
 							position: 1,
 							name: 'Home',
-							item: '`https://nhentai.pics`'
+							item: '`https://nhentai.pics'
 						},
 						{
 							'@type': 'ListItem',
 							position: 2,
 							name: 'Browse',
-							item: '`https://nhentai.pics`/browse'
+							item: '`https://nhentai.pics/browse'
 						},
 						{
 							'@type': 'ListItem',
 							position: 3,
 							name: typeLabel + 's',
-							item: `https://nhentai.pics`/p/${type}`
+							item: `https://nhentai.pics/p/${type}`
 						},
 						{
 							'@type': 'ListItem',
