@@ -54,7 +54,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
     seo: {
       title: `Browse ${totalTags}+ Manga Tags & Categories A-Z | NHentai`,
       description: `Explore ${totalTags} manga tags organized alphabetically. Find content by genre, theme, character type, and fetish. Popular tags: ${popularTags.toLowerCase()}.`,
-      canonical: ``https://nhentai.pics`${url.pathname}`,
+      canonical: `https://nhentai.pics`${url.pathname}`,
       keywords: `manga tags, hentai tags, doujin categories, ${popularTags.toLowerCase()}, manga genres, adult manga tags, anime tags`,
       ogTitle: `${totalTags}+ Manga Tags | Browse by Category`,
       ogDescription: `Complete collection of manga tags and categories. Filter by genre, character type, themes, and more to find exactly what you're looking for.`,
@@ -64,7 +64,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
         '@type': 'CollectionPage',
         name: 'Manga Tags & Categories',
         description: `Browse our comprehensive collection of ${totalTags} manga tags and categories organized alphabetically`,
-        url: ``https://nhentai.pics`${url.pathname}`,
+        url: `https://nhentai.pics`${url.pathname}`,
         mainEntity: {
           '@type': 'ItemList',
           numberOfItems: totalTags,
@@ -74,7 +74,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
             item: {
               '@type': 'DefinedTerm',
               name: tag.name,
-              url: ``https://nhentai.pics`/browse/tags/${tag.slug}`,
+              url: `https://nhentai.pics`/browse/tags/${tag.slug}`,
               inDefinedTermSet: {
                 '@type': 'DefinedTermSet',
                 name: 'Manga Tags'
@@ -101,7 +101,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
               '@type': 'ListItem',
               position: 3,
               name: 'Tags',
-              item: ``https://nhentai.pics`${url.pathname}`
+              item: `https://nhentai.pics`${url.pathname}`
             }
           ]
         }

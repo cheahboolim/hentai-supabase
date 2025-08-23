@@ -168,9 +168,9 @@ export const load: PageServerLoad = async ({ params, url }) => {
 						position: (page - 1) * PAGE_SIZE + index + 1,
 						item: {
 							'@type': 'Book',
-							'@id': ``https://nhentai.pics`/comic/${comic.slug}`,
+							'@id': `https://nhentai.pics`/comic/${comic.slug}`,
 							name: comic.title,
-							url: ``https://nhentai.pics`/comic/${comic.slug}`,
+							url: `https://nhentai.pics`/comic/${comic.slug}`,
 							image: comic.featureImage,
 							author: {
 								'@type': 'Person',
@@ -198,7 +198,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
 							'@type': 'ListItem',
 							position: 3,
 							name: typeLabel + 's',
-							item: ``https://nhentai.pics`/p/${type}`
+							item: `https://nhentai.pics`/p/${type}`
 						},
 						{
 							'@type': 'ListItem',

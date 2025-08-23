@@ -37,7 +37,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
     seo: {
       title: `Browse ${totalParodies}+ Hentai Parodies A-Z | NHentai`,
       description: `Discover manga parodies from ${availableLetters.join(', ')}. Find Naruto, One Piece, Dragon Ball, Attack on Titan, and ${totalParodies - 4}+ more anime, game, and comic parodies.`,
-      canonical: ``https://nhentai.pics`${url.pathname}`,
+      canonical: `https://nhentai.pics`${url.pathname}`,
       keywords: 'manga parodies, anime parodies, doujinshi, hentai manga, comic parodies, game parodies, ' + popularParodies.toLowerCase(),
       ogTitle: `${totalParodies}+ Manga Parodies | Browse A-Z`,
       ogDescription: `Complete collection of manga parodies organized alphabetically. Find your favorite anime, game, and comic parodies.`,
@@ -57,7 +57,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
             item: {
               '@type': 'CreativeWork',
               name: parody.name,
-              url: ``https://nhentai.pics`/browse/parodies/${parody.slug}`
+              url: `https://nhentai.pics`/browse/parodies/${parody.slug}`
             }
           }))
         }
