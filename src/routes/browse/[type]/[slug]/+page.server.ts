@@ -153,7 +153,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
 			keywords: `${meta.name.toLowerCase()}, ${type}, manga, doujinshi, hentai, adult manga, ${meta.name.toLowerCase()} manga`,
 			ogTitle: `${meta.name} ${typeLabel} - ${totalManga} Manga`,
 			ogDescription: generateDescription(),
-			ogImage: comics[0]?.featureImage || 'https://susmanga.com/images/browse-og.jpg',
+			ogImage: comics[0]?.featureImage || '`https://${import.meta.env.PUBLIC_WEBSITE_BASE_DOMAIN}`/images/browse-og.jpg',
 			structuredData: {
 				'@context': 'https://schema.org',
 				'@type': 'CollectionPage',
@@ -168,9 +168,9 @@ export const load: PageServerLoad = async ({ params, url }) => {
 						position: (page - 1) * PAGE_SIZE + index + 1,
 						item: {
 							'@type': 'Book',
-							'@id': `https://susmanga.com/comic/${comic.slug}`,
+							'@id': ``https://${import.meta.env.PUBLIC_WEBSITE_BASE_DOMAIN}`/comic/${comic.slug}`,
 							name: comic.title,
-							url: `https://susmanga.com/comic/${comic.slug}`,
+							url: ``https://${import.meta.env.PUBLIC_WEBSITE_BASE_DOMAIN}`/comic/${comic.slug}`,
 							image: comic.featureImage,
 							author: {
 								'@type': 'Person',
@@ -186,19 +186,19 @@ export const load: PageServerLoad = async ({ params, url }) => {
 							'@type': 'ListItem',
 							position: 1,
 							name: 'Home',
-							item: 'https://susmanga.com'
+							item: '`https://${import.meta.env.PUBLIC_WEBSITE_BASE_DOMAIN}`'
 						},
 						{
 							'@type': 'ListItem',
 							position: 2,
 							name: 'Browse',
-							item: 'https://susmanga.com/browse'
+							item: '`https://${import.meta.env.PUBLIC_WEBSITE_BASE_DOMAIN}`/browse'
 						},
 						{
 							'@type': 'ListItem',
 							position: 3,
 							name: typeLabel + 's',
-							item: `https://susmanga.com/p/${type}`
+							item: ``https://${import.meta.env.PUBLIC_WEBSITE_BASE_DOMAIN}`/p/${type}`
 						},
 						{
 							'@type': 'ListItem',

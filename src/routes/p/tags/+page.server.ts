@@ -52,19 +52,19 @@ export const load: PageServerLoad = async ({ locals, url }) => {
     totalTags,
     availableLetters,
     seo: {
-      title: `Browse ${totalTags}+ Manga Tags & Categories A-Z | SusManga`,
+      title: `Browse ${totalTags}+ Manga Tags & Categories A-Z | NHentai`,
       description: `Explore ${totalTags} manga tags organized alphabetically. Find content by genre, theme, character type, and fetish. Popular tags: ${popularTags.toLowerCase()}.`,
-      canonical: `https://susmanga.com${url.pathname}`,
+      canonical: ``https://${import.meta.env.PUBLIC_WEBSITE_BASE_DOMAIN}`${url.pathname}`,
       keywords: `manga tags, hentai tags, doujin categories, ${popularTags.toLowerCase()}, manga genres, adult manga tags, anime tags`,
       ogTitle: `${totalTags}+ Manga Tags | Browse by Category`,
       ogDescription: `Complete collection of manga tags and categories. Filter by genre, character type, themes, and more to find exactly what you're looking for.`,
-      ogImage: 'https://susmanga.com/images/tags-og.jpg',
+      ogImage: '`https://${import.meta.env.PUBLIC_WEBSITE_BASE_DOMAIN}`/images/tags-og.jpg',
       structuredData: {
         '@context': 'https://schema.org',
         '@type': 'CollectionPage',
         name: 'Manga Tags & Categories',
         description: `Browse our comprehensive collection of ${totalTags} manga tags and categories organized alphabetically`,
-        url: `https://susmanga.com${url.pathname}`,
+        url: ``https://${import.meta.env.PUBLIC_WEBSITE_BASE_DOMAIN}`${url.pathname}`,
         mainEntity: {
           '@type': 'ItemList',
           numberOfItems: totalTags,
@@ -74,7 +74,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
             item: {
               '@type': 'DefinedTerm',
               name: tag.name,
-              url: `https://susmanga.com/browse/tags/${tag.slug}`,
+              url: ``https://${import.meta.env.PUBLIC_WEBSITE_BASE_DOMAIN}`/browse/tags/${tag.slug}`,
               inDefinedTermSet: {
                 '@type': 'DefinedTermSet',
                 name: 'Manga Tags'
@@ -89,19 +89,19 @@ export const load: PageServerLoad = async ({ locals, url }) => {
               '@type': 'ListItem',
               position: 1,
               name: 'Home',
-              item: 'https://susmanga.com'
+              item: '`https://${import.meta.env.PUBLIC_WEBSITE_BASE_DOMAIN}`'
             },
             {
               '@type': 'ListItem',
               position: 2,
               name: 'Browse',
-              item: 'https://susmanga.com/browse'
+              item: '`https://${import.meta.env.PUBLIC_WEBSITE_BASE_DOMAIN}`/browse'
             },
             {
               '@type': 'ListItem',
               position: 3,
               name: 'Tags',
-              item: `https://susmanga.com${url.pathname}`
+              item: ``https://${import.meta.env.PUBLIC_WEBSITE_BASE_DOMAIN}`${url.pathname}`
             }
           ]
         }

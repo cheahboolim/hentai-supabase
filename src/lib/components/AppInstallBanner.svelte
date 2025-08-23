@@ -21,7 +21,7 @@
 	// Check if PWA is already installed
 	function checkIfInstalled(): boolean {
 		// Check if already installed via localStorage
-		if (typeof localStorage !== 'undefined' && localStorage.getItem('susmanga_installed') === '1') {
+		if (typeof localStorage !== 'undefined' && localStorage.getItem('NHentai_installed') === '1') {
 			return true;
 		}
 		
@@ -41,7 +41,7 @@
 	// Check if user has dismissed banner recently
 	function checkIfDismissed(): boolean {
 		if (typeof localStorage === 'undefined') return false;
-		const dismissedAt = localStorage.getItem('susmanga_banner_dismissed');
+		const dismissedAt = localStorage.getItem('NHentai_banner_dismissed');
 		if (!dismissedAt) return false;
 		
 		// Show again after 7 days
@@ -71,7 +71,7 @@
 		window.addEventListener('appinstalled', () => {
 			console.log('[PWA] appinstalled fired');
 			if (typeof localStorage !== 'undefined') {
-				localStorage.setItem('susmanga_installed', '1');
+				localStorage.setItem('NHentai_installed', '1');
 			}
 			trackEvent('pwa_installed', {
 				category: 'PWA',
@@ -113,7 +113,7 @@
 	// Handle banner dismissal
 	function dismissBanner() {
 		if (typeof localStorage !== 'undefined') {
-			localStorage.setItem('susmanga_banner_dismissed', Date.now().toString());
+			localStorage.setItem('NHentai_banner_dismissed', Date.now().toString());
 		}
 		trackEvent('pwa_banner_dismissed', {
 			category: 'PWA',

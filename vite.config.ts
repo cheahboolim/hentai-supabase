@@ -32,7 +32,7 @@ export default defineConfig({
 	],
 	server: {
 		host: true,
-		allowedHosts: ['susmanga.com', 's.susmanga.com']
+		allowedHosts: ['nhentai.pics', 's.nhentai.pics']
 	},
 	test: {
 		include: ['src/**/*.{test,spec}.{js,ts}']

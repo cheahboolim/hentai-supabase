@@ -9,8 +9,8 @@
     rel="noopener noreferrer"
   >
     <img
-      src="https://cdn.susmanga.com/blueballs%20ads%20on%20susmanga.gif"
-      alt="SusManga Ad"
+      src="{import.meta.env.PUBLIC_CDN_BASE_URL}/blueballs%20ads%20on%20NHentai.gif"
+      alt="NHentai Ad"
       width="300"
       height="300"
       loading="lazy"

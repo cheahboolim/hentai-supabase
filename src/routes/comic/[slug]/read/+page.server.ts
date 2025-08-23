@@ -122,7 +122,7 @@ export async function load({ params, url: _url }) {
 
   // 7) Generate comprehensive SEO metadata on server-side
   const baseTitle = manga.title;
-  const siteTitle = "SusManga";
+  const siteTitle = "NHentai";
   const separator = " | ";
   
   // More descriptive and unique titles
@@ -132,11 +132,11 @@ export async function load({ params, url: _url }) {
 
   // Rich description with more context
   const seoDescription = pageNum === 1
-    ? `Read ${baseTitle} manga online for free at SusManga. High quality translated manga with fast updates.${tagNames.length > 0 ? ` Available genres: ${tagNames.slice(0, 3).join(', ')}.` : ''}`
-    : `Continue reading ${baseTitle} - Page ${pageNum} at SusManga. Free online manga reader with high quality images and fast loading.`;
+    ? `Read ${baseTitle} manga online for free at NHentai. High quality translated manga with fast updates.${tagNames.length > 0 ? ` Available genres: ${tagNames.slice(0, 3).join(', ')}.` : ''}`
+    : `Continue reading ${baseTitle} - Page ${pageNum} at NHentai. Free online manga reader with high quality images and fast loading.`;
 
   // Canonical URL
-  const canonical = `https://susmanga.com/comic/${slug}/read${
+  const canonical = ``https://${import.meta.env.PUBLIC_WEBSITE_BASE_DOMAIN}`/comic/${slug}/read${
     pageNum > 1 ? `?page=${pageNum}` : ''
   }`;
 
@@ -158,14 +158,14 @@ export async function load({ params, url: _url }) {
     "@type": "ComicSeries",
     "name": manga.title,
     "description": seoDescription,
-    "url": `https://susmanga.com/comic/${slug}`,
+    "url": ``https://${import.meta.env.PUBLIC_WEBSITE_BASE_DOMAIN}`/comic/${slug}`,
     "image": ogImage,
     "genre": tagNames,
     "numberOfEpisodes": totalPages,
     "publisher": {
       "@type": "Organization",
       "name": siteTitle,
-      "url": "https://susmanga.com"
+      "url": "`https://${import.meta.env.PUBLIC_WEBSITE_BASE_DOMAIN}`"
     }
   };
 

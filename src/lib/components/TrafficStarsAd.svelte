@@ -22,7 +22,7 @@
 					type: 'label-under',
 					cols: 4,
 					rows: 1,
-					title: 'Susmanga.com Ads',
+					title: 'nhentai.pics Ads',
 					titlePosition: 'left',
 					adsByPosition: 'right',
 					breakpoints: [

@@ -1,6 +1,6 @@
 <script lang="ts">
-  export let href: string = 'https://news.susmanga.com/7-meme';
-  export let image: string = 'https://cdn.susmanga.com/alanding/7%20-%20meme/cover.jpg';
+  export let href: string = 'https://news.nhentai.pics/7-meme';
+  export let image: string = '{import.meta.env.PUBLIC_CDN_BASE_URL}/alanding/7%20-%20meme/cover.jpg';
 </script>
 
 <a href={href} target="_blank" rel="noopener noreferrer" class="block w-[300px] h-[250px]">
@@ -17,7 +17,7 @@
     <!-- Text / CTA -->
     <div class="p-3 bg-[#121518] text-center h-[125px] flex flex-col justify-center">
       <p class="text-sm text-slate-200 mb-2 font-semibold">
-        💥 SusManga Meme Coin Poll is Live!
+        💥 NHentai Meme Coin Poll is Live!
       </p>
       <p class="text-xs text-slate-400 mb-3">
         Vote for your favorite meme coin under $0.01 🍕💰

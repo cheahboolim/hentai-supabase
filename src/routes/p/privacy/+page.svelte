@@ -11,7 +11,7 @@
     <div>
       <h2 class="text-2xl font-semibold mb-2">1. Introduction</h2>
       <p>
-        At SusManga, we are committed to protecting your privacy. This Privacy Policy explains how we collect, use, and safeguard your information when you use our website.
+        At NHentai, we are committed to protecting your privacy. This Privacy Policy explains how we collect, use, and safeguard your information when you use our website.
       </p>
     </div>
 
@@ -28,7 +28,7 @@
       <h2 class="text-2xl font-semibold mb-2">3. How We Use Your Information</h2>
       <p>We use the collected data to:</p>
       <ul class="list-disc ml-6 space-y-1">
-        <li>Operate and improve SusManga</li>
+        <li>Operate and improve NHentai</li>
         <li>Prevent abuse or illegal activity</li>
         <li>Understand usage patterns and user preferences</li>
       </ul>
@@ -51,7 +51,7 @@
     <div>
       <h2 class="text-2xl font-semibold mb-2">6. Data Security</h2>
       <p>
-        We take reasonable steps to protect your data, but no system is 100% secure. Use SusManga at your own risk and avoid sharing sensitive personal information.
+        We take reasonable steps to protect your data, but no system is 100% secure. Use NHentai at your own risk and avoid sharing sensitive personal information.
       </p>
     </div>
 
@@ -78,7 +78,7 @@
           target="_blank"
           class="underline text-pink-600"
         >
-          Contact SusManga.com
+          Contact nhentai.pics
         </a>.
       </p>
     </div>

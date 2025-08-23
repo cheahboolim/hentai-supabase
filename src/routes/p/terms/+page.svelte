@@ -11,7 +11,7 @@
     <div>
       <h2 class="text-2xl font-semibold mb-2">1. Acceptance of Terms</h2>
       <p>
-        By accessing or using SusManga, you agree to be bound by these Terms of Service and our Privacy Policy. If you do not agree, please do not use the site.
+        By accessing or using NHentai, you agree to be bound by these Terms of Service and our Privacy Policy. If you do not agree, please do not use the site.
       </p>
     </div>
 
@@ -25,7 +25,7 @@
     <div>
       <h2 class="text-2xl font-semibold mb-2">3. Intellectual Property</h2>
       <p>
-        SusManga does not claim ownership of user-uploaded content. However, by posting content on our platform, you grant us a non-exclusive, royalty-free license to display and distribute your content for the purposes of operating the site.
+        NHentai does not claim ownership of user-uploaded content. However, by posting content on our platform, you grant us a non-exclusive, royalty-free license to display and distribute your content for the purposes of operating the site.
       </p>
     </div>
 
@@ -48,7 +48,7 @@
     <div>
       <h2 class="text-2xl font-semibold mb-2">6. Disclaimer</h2>
       <p>
-        SusManga is provided “as is.” We make no guarantees of uptime, accuracy, or that the content is free of errors. Use at your own risk.
+        NHentai is provided “as is.” We make no guarantees of uptime, accuracy, or that the content is free of errors. Use at your own risk.
       </p>
     </div>
 
@@ -63,7 +63,7 @@
       <h2 class="text-2xl font-semibold mb-2">8. Contact</h2>
       <p>
         For questions about these Terms, please contact us at
-        <a href="https://tally.so/r/mBqEd5" target="_blank" class="underline text-pink-600">Contact Susmanga.com</a>.
+        <a href="https://tally.so/r/mBqEd5" target="_blank" class="underline text-pink-600">Contact nhentai.pics</a>.
       </p>
     </div>
   </section>

@@ -118,7 +118,7 @@ export const load: PageServerLoad = async ({ url }) => {
 				? 'nHentai Pics | Read Hentai, Doujinshi, and Latest Pictures'
 				: `Popular Hentai | Page ${page} | nHentai `,
 			description: isFirstPage
-				? 'Discover popular manga, hentai, and doujinshi that others are reading on SusManga. Find trending adult comics and community favorites!'
+				? 'Discover popular manga, hentai, and doujinshi that others are reading on NHentai. Find trending adult comics and community favorites!'
 				: `Browse page ${page} of popular hentai selections. Discover trending adult comics, hentai and doujinshi. Nhentai Alternative | Rule 34 Alternative`,
 			prev: page > 1 ? `/?page=${page - 1}&seed=${seed}` : null,
 			next: page < totalPages ? `/?page=${page + 1}&seed=${seed}` : null

@@ -90,7 +90,7 @@
           'item_id': `${slug}_page_${currentPage}`,
           'item_name': `${manga.title} - Page ${currentPage}`,
           'item_category': 'comic',
-          'item_brand': 'SusManga',
+          'item_brand': 'NHentai',
           'item_variant': `page_${currentPage}`,
           'quantity': 1,
           'price': 0.001
@@ -210,8 +210,8 @@
   // Dynamic page title for browser tab
   let pageTitle: string;
   $: pageTitle = currentPage === 1
-    ? `Read ${manga.title} Online Free - Chapter ${currentPage} | SusManga`
-    : `${manga.title} - Page ${currentPage} Online Reader | SusManga`;
+    ? `Read ${manga.title} Online Free - Chapter ${currentPage} | NHentai`
+    : `${manga.title} - Page ${currentPage} Online Reader | NHentai`;
 </script>
 
 <svelte:head>
@@ -226,7 +226,7 @@
   <meta property="og:title" content={data.seo.title} />
   <meta property="og:description" content={data.seo.description} />
   <meta property="og:image" content={data.seo.ogImage} />
-  <meta property="og:site_name" content="SusManga" />
+  <meta property="og:site_name" content="NHentai" />
   
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image" />
@@ -404,7 +404,7 @@
       href="/"
       class="px-6 py-2 bg-pink-600 text-white rounded hover:bg-pink-700 transition-colors"
     >
-      🏠 Back to SUSMANGA.COM
+      🏠 Back to nhentai.pics
     </a>
   </nav>
 

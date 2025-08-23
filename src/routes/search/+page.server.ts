@@ -17,8 +17,8 @@ export const load: PageServerLoad = async ({ url, locals }) => {
 			page: 1,
 			totalPages: 1,
 			meta: {
-				title: 'Search | SusManga',
-				description: 'Search for manga on SusManga.',
+				title: 'Search | NHentai',
+				description: 'Search for manga on NHentai.',
 				prev: null,
 				next: null
 			}
