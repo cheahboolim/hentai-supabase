@@ -115,7 +115,7 @@ export async function load({ params, url: _url }) {
         title: item.title,
         slug: randomSlugs.find((s) => s.manga_id === item.id)?.slug ?? '',
         featureImage: item.feature_image_url,
-        author: { name: 'Sus Manga Hentai' }
+        author: { name: 'Read N Hentai' }
       }));
     }
   }
