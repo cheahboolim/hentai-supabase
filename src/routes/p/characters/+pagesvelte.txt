@@ -7,7 +7,7 @@
 <svelte:head>
 	<title>Characters – Browse by Name | NHentai</title>
 	<meta name="description" content="Browse all characters featured in NHentai. Organized alphabetically for easier discovery." />
-	<link rel="canonical" href="`https://${import.meta.env.PUBLIC_WEBSITE_BASE_DOMAIN}`/p/characters" />
+	<link rel="canonical" href="`https://nhentai.pics`/p/characters" />
 </svelte:head>
 
 <div class="px-4 sm:px-6 lg:px-8 py-8 max-w-6xl mx-auto text-white">

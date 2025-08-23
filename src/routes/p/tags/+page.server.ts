@@ -54,17 +54,17 @@ export const load: PageServerLoad = async ({ locals, url }) => {
     seo: {
       title: `Browse ${totalTags}+ Manga Tags & Categories A-Z | NHentai`,
       description: `Explore ${totalTags} manga tags organized alphabetically. Find content by genre, theme, character type, and fetish. Popular tags: ${popularTags.toLowerCase()}.`,
-      canonical: ``https://${import.meta.env.PUBLIC_WEBSITE_BASE_DOMAIN}`${url.pathname}`,
+      canonical: ``https://nhentai.pics`${url.pathname}`,
       keywords: `manga tags, hentai tags, doujin categories, ${popularTags.toLowerCase()}, manga genres, adult manga tags, anime tags`,
       ogTitle: `${totalTags}+ Manga Tags | Browse by Category`,
       ogDescription: `Complete collection of manga tags and categories. Filter by genre, character type, themes, and more to find exactly what you're looking for.`,
-      ogImage: '`https://${import.meta.env.PUBLIC_WEBSITE_BASE_DOMAIN}`/images/tags-og.jpg',
+      ogImage: '`https://nhentai.pics`/images/tags-og.jpg',
       structuredData: {
         '@context': 'https://schema.org',
         '@type': 'CollectionPage',
         name: 'Manga Tags & Categories',
         description: `Browse our comprehensive collection of ${totalTags} manga tags and categories organized alphabetically`,
-        url: ``https://${import.meta.env.PUBLIC_WEBSITE_BASE_DOMAIN}`${url.pathname}`,
+        url: ``https://nhentai.pics`${url.pathname}`,
         mainEntity: {
           '@type': 'ItemList',
           numberOfItems: totalTags,
@@ -74,7 +74,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
             item: {
               '@type': 'DefinedTerm',
               name: tag.name,
-              url: ``https://${import.meta.env.PUBLIC_WEBSITE_BASE_DOMAIN}`/browse/tags/${tag.slug}`,
+              url: ``https://nhentai.pics`/browse/tags/${tag.slug}`,
               inDefinedTermSet: {
                 '@type': 'DefinedTermSet',
                 name: 'Manga Tags'
@@ -89,19 +89,19 @@ export const load: PageServerLoad = async ({ locals, url }) => {
               '@type': 'ListItem',
               position: 1,
               name: 'Home',
-              item: '`https://${import.meta.env.PUBLIC_WEBSITE_BASE_DOMAIN}`'
+              item: '`https://nhentai.pics`'
             },
             {
               '@type': 'ListItem',
               position: 2,
               name: 'Browse',
-              item: '`https://${import.meta.env.PUBLIC_WEBSITE_BASE_DOMAIN}`/browse'
+              item: '`https://nhentai.pics`/browse'
             },
             {
               '@type': 'ListItem',
               position: 3,
               name: 'Tags',
-              item: ``https://${import.meta.env.PUBLIC_WEBSITE_BASE_DOMAIN}`${url.pathname}`
+              item: ``https://nhentai.pics`${url.pathname}`
             }
           ]
         }
