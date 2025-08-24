@@ -1,8 +1,8 @@
-// src/routes/sitemap-manga-galleries-[index]/+server.ts
+// src/routes/sitemaps/sitemap-manga-galleries-[index]/+server.ts
 import { supabase } from '$lib/supabaseClient';
 
 const SITE_URL = 'https://nhentai.pics';
-const URLS_PER_SITEMAP = 50000;
+const URLS_PER_SITEMAP = 25000;
 
 interface SitemapUrl {
   loc: string;
@@ -27,6 +27,7 @@ export async function GET({ params }) {
       `)
       .not('slug', 'is', null)
       .neq('slug', '')
+      .order('manga_id') // Consistent ordering
       .range(index * URLS_PER_SITEMAP, (index + 1) * URLS_PER_SITEMAP - 1);
 
     const urls: SitemapUrl[] = [];
@@ -42,7 +43,7 @@ export async function GET({ params }) {
           loc: `${SITE_URL}/hentai/${item.slug}`,
           lastmod,
           changefreq: 'monthly',
-          priority: '0.5'
+          priority: '0.7'
         });
       }
     }
@@ -52,7 +53,7 @@ export async function GET({ params }) {
     return new Response(sitemap, {
       headers: {
         'Content-Type': 'application/xml',
-        'Cache-Control': 'max-age=3600'
+        'Cache-Control': 'max-age=86400'
       }
     });
   } catch (error) {
@@ -60,7 +61,7 @@ export async function GET({ params }) {
     return new Response(generateSitemapXML([]), {
       headers: {
         'Content-Type': 'application/xml',
-        'Cache-Control': 'max-age=300'
+        'Cache-Control': 'max-age=3600'
       }
     });
   }

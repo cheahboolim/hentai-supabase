@@ -1,4 +1,4 @@
-// src/routes/sitemap-static.xml/+server.ts
+// src/routes/sitemaps/sitemap-static.xml/+server.ts
 const SITE_URL = 'https://nhentai.pics';
 
 interface SitemapUrl {
@@ -20,49 +20,50 @@ export async function GET() {
       loc: `${SITE_URL}/browse`,
       lastmod: new Date().toISOString().split('T')[0],
       changefreq: 'daily',
-      priority: '0.8'
+      priority: '0.9'
     },
+    // Category index pages
     {
       loc: `${SITE_URL}/p/tags`,
       lastmod: new Date().toISOString().split('T')[0],
       changefreq: 'weekly',
-      priority: '0.7'
+      priority: '0.8'
     },
     {
       loc: `${SITE_URL}/p/artists`,
       lastmod: new Date().toISOString().split('T')[0],
       changefreq: 'weekly',
-      priority: '0.7'
+      priority: '0.8'
     },
     {
       loc: `${SITE_URL}/p/categories`,
       lastmod: new Date().toISOString().split('T')[0],
       changefreq: 'weekly',
-      priority: '0.7'
+      priority: '0.8'
     },
     {
       loc: `${SITE_URL}/p/parodies`,
       lastmod: new Date().toISOString().split('T')[0],
       changefreq: 'weekly',
-      priority: '0.7'
+      priority: '0.8'
     },
     {
       loc: `${SITE_URL}/p/characters`,
       lastmod: new Date().toISOString().split('T')[0],
       changefreq: 'weekly',
-      priority: '0.7'
+      priority: '0.8'
     },
     {
       loc: `${SITE_URL}/p/languages`,
       lastmod: new Date().toISOString().split('T')[0],
       changefreq: 'weekly',
-      priority: '0.7'
+      priority: '0.8'
     },
     {
       loc: `${SITE_URL}/p/groups`,
       lastmod: new Date().toISOString().split('T')[0],
       changefreq: 'weekly',
-      priority: '0.7'
+      priority: '0.8'
     }
   ];
 
@@ -71,7 +72,7 @@ export async function GET() {
   return new Response(sitemap, {
     headers: {
       'Content-Type': 'application/xml',
-      'Cache-Control': 'max-age=3600'
+      'Cache-Control': 'max-age=86400'
     }
   });
 }

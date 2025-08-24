@@ -1,6 +1,6 @@
 <script lang="ts">
   import { writable, derived } from 'svelte/store';
-  import { seo } from '$lib/seo';
+  import { seo } from '$lib/seo.ts.txt';
   import { onMount } from 'svelte';
 
   export let data: {

@@ -1,39 +1,17 @@
-# Robots.txt for nhentai.pics
 User-agent: *
 Allow: /
 
-# Allow crawling of main content
+# Important content sections
 Allow: /hentai/
 Allow: /browse/
 Allow: /p/
 
-# Block admin or API endpoints if any
+# Block admin/api routes if any
 Disallow: /api/
 Disallow: /admin/
 
-# Block any private or temporary files
-Disallow: /_*
-Disallow: /tmp/
-Disallow: /temp/
-
-# Allow common crawlers
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Slurp
-Allow: /
-
-User-agent: DuckDuckBot
-Allow: /
-
-# Crawl delay to be respectful (optional)
-Crawl-delay: 1
-
 # Sitemap locations
-Sitemap: https://nhentai.pics/sitemaps/sitemap.xml
-Sitemap: https://nhentai.pics/sitemaps/sitemap-static.xml
-Sitemap: https://nhentai.pics/sitemaps/sitemap-browse.xml
-Sitemap: https://nhentai.pics/sitemaps/sitemap-manga.xml
+Sitemap: https://nhentai.pics/sitemap.xml
+
+# Crawl-delay for respectful crawling
+Crawl-delay: 1

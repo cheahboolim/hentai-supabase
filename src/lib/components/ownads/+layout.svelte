@@ -4,7 +4,7 @@
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import { afterNavigate } from '$app/navigation';
-	import { seo } from '$lib/seo';
+	import { seo } from '$lib/seo.ts.txt';
 	import { trackPageView } from '$lib/gtm.js';
 
 	import MainNav from '$lib/components/MainNav.svelte';
