@@ -50,14 +50,14 @@
 		<Coinpoll />
 	</div>-->
 
-	<main class="flex-1">
-		<slot />
-	</main>
-
-	<!-- Mid Banner Ad -->
+		<!-- Mid Banner Ad -->
 	<div class="container mx-auto px-4 py-2">
 		<AAdsBanner />
 	</div>
+
+	<main class="flex-1">
+		<slot />
+	</main>
 
 	<!-- Bottom Banner Ad 
 	<div class="container mx-auto px-4 py-2">
