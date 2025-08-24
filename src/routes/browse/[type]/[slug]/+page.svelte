@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { seo } from '$lib/seo.ts.txt';
+  import { seo } from '$lib/seo.ts';
   import NativeAds from '$lib/components/adsterra/NativeAds.svelte';
   import TrafficStarsAd from '$lib/components/TrafficStarsAd.svelte';
 

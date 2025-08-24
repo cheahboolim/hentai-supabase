@@ -4,7 +4,7 @@
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
   import { onMount } from 'svelte';
-  import { seo } from '$lib/seo.ts.txt';
+  import { seo } from '$lib/seo.ts';
   import SimilarManga from '$lib/components/SimilarManga.svelte';
   import RandomPost from '$lib/components/RandomPost.svelte';
   import TrafficStarsAd from '$lib/components/TrafficStarsAd.svelte';
