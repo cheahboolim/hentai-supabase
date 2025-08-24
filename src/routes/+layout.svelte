@@ -45,10 +45,10 @@
 <div class="relative flex min-h-screen flex-col bg-background text-foreground antialiased">
 	<MainNav />
 
-	<!-- Top Banner Ad -->
+	<!-- Top Banner Ad 
 	<div class="container mx-auto px-4 py-2 flex justify-center">
 		<Coinpoll />
-	</div>
+	</div>-->
 
 	<main class="flex-1">
 		<slot />
@@ -59,10 +59,10 @@
 		<AAdsBanner />
 	</div>
 
-	<!-- Bottom Banner Ad -->
+	<!-- Bottom Banner Ad 
 	<div class="container mx-auto px-4 py-2">
 		<BlueBallsAd />
-	</div>
+	</div>-->
 
 	<!-- App Install CTA -->
 	<div class="container mx-auto px-4 py-2">
@@ -71,7 +71,7 @@
 
 	<Footer />
 
-	<!-- Video Slider Ads (full width, no container to avoid breaking layout) -->
+	<!-- Video Slider Ads (full width, no container to avoid breaking layout) 
 	<ExoClickSlider />
-	<ExoOutstreamAd />
+	<ExoOutstreamAd />-->
 </div>
