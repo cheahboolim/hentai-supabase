@@ -1,19 +1,18 @@
-<!-- src/lib/components/Ads/AAdsBlock.svelte -->
-<div class="w-full flex flex-col items-center justify-center my-6">
+<!-- src/lib/components/Ads/AAdsBanner.svelte -->
+<div id="frame" style="width: 300px;margin: auto;z-index: 99998;height: auto">
   <iframe
-    data-aa="2401977"
-    src="https://ad.a-ads.com/2401977?size=300x250"
-    style="width:300px; height:250px; border:0; padding:0; overflow:hidden; background-color:transparent;"
+    title="AADS Banner Ad 300x250"
+    data-aa="2407960"
+    src="//ad.a-ads.com/2407960/?size=300x250"
+    style="border:0; padding:0; width:300px; height:250px; overflow:hidden;display: block;margin: auto"
   ></iframe>
 
   <a
-    id="frame-link"
-    title="Ads"
-    href="https://aads.com/campaigns/new/?source_id=2401977&source_type=ad_unit&partner=2401977"
-    class="text-xs text-right mt-1 text-gray-400 hover:text-white transition"
+    href="https://aads.com/?partner=2407960"
+    class="text-xs text-right mt-1 text-gray-400 hover:text-white transition block text-center"
     target="_blank"
     rel="noopener noreferrer"
   >
-    Advertise here
+    Advertise Here
   </a>
 </div>
