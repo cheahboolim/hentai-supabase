@@ -18,7 +18,7 @@
 	import Coinpoll from '$lib/components/ownads/coinpoll.svelte';
 
 	// Google Analytics ID
-	const GA_TRACKING_ID = 'G-BXTY3KYWKH';
+	const GA_TRACKING_ID = 'G-PC7E1QDSXJ';
 
 	onMount(() => {
 		// Initialize Google Analytics
