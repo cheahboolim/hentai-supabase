@@ -1,13 +1,11 @@
 <script>
 	// Keep your existing imports
-	import { browser } from '$app/environment'; // Make sure 'browser' is imported
+	import { browser } from '$app/environment';
 	import '../app.css';
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import { afterNavigate } from '$app/navigation';
 	import { seo } from '$lib/seo.ts';
-	// We no longer need this, as the logic is now directly in this file
-	// import { trackPageView } from '$lib/gtm.js'; 
 
 	import MainNav from '$lib/components/MainNav.svelte';
 	import Footer from '$lib/components/Footer.svelte';
@@ -19,23 +17,25 @@
 	import ExoOutstreamAd from '$lib/components/ExoOutstreamAd.svelte';
 	import Coinpoll from '$lib/components/ownads/coinpoll.svelte';
 
-	// 1. Get GTM ID from environment variables
-	const GTM_ID = import.meta.env.VITE_GTM_ID;
+	// Google Analytics ID
+	const GA_TRACKING_ID = 'G-BXTY3KYWKH';
 
 	onMount(() => {
-		// Future setup: theme, auth, etc.
+		// Initialize Google Analytics
+		if (browser && GA_TRACKING_ID) {
+			window.gtag('config', GA_TRACKING_ID, {
+				page_title: document.title,
+				page_location: window.location.href
+			});
+		}
 	});
 
-	// 2. Updated to push a 'page_view' event to the dataLayer on navigation
+	// Track page views on navigation
 	afterNavigate(() => {
-		if (browser) {
-			window.dataLayer = window.dataLayer || [];
-			window.dataLayer.push({
-				event: 'page_view',
-				page: {
-					path: $page.url.pathname,
-					title: document.title // Use the actual document title
-				}
+		if (browser && GA_TRACKING_ID) {
+			window.gtag('config', GA_TRACKING_ID, {
+				page_path: $page.url.pathname,
+				page_title: document.title
 			});
 		}
 	});
@@ -76,34 +76,21 @@
 		href="{import.meta.env.PUBLIC_CDN_BASE_URL}/favicon/android-chrome-512x512.png"
 	/>
 
-	{#if GTM_ID && browser}
+	<!-- Google Analytics -->
+	{#if GA_TRACKING_ID && browser}
+		<script async src="https://www.googletagmanager.com/gtag/js?id={GA_TRACKING_ID}"></script>
 		<script>
-			(function (w, d, s, l, i) {
-				w[l] = w[l] || [];
-				w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
-				var f = d.getElementsByTagName(s)[0],
-					j = d.createElement(s),
-					dl = l != 'dataLayer' ? '&l=' + l : '';
-				j.async = true;
-				j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
-				f.parentNode.insertBefore(j, f);
-			})(window, document, 'script', 'dataLayer', GTM_ID);
+			window.dataLayer = window.dataLayer || [];
+			function gtag() {
+				dataLayer.push(arguments);
+			}
+			gtag('js', new Date());
+			// Initial config will be called in onMount
 		</script>
-		{/if}
+	{/if}
 </svelte:head>
 
 <div class="relative flex min-h-screen flex-col bg-background text-foreground antialiased">
-	{#if GTM_ID}
-		<noscript
-			><iframe
-				src="https://www.googletagmanager.com/ns.html?id={GTM_ID}"
-				height="0"
-				width="0"
-				style="display:none;visibility:hidden"
-			></iframe></noscript
-		>
-	{/if}
-
 	<MainNav />
 
 	<div class="container mx-auto px-4 py-2">
@@ -119,5 +106,4 @@
 	</div>
 
 	<Footer />
-
-	</div>
+</div>
