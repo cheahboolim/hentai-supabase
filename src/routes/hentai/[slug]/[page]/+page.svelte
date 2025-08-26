@@ -74,7 +74,7 @@
 
       // Track as conversion event with value
       gtag('event', 'conversion', {
-        'send_to': 'G-KT8S50J7ZK', // Replace GA_MEASUREMENT_ID with your actual ID
+        'send_to': 'G-BXTY3KYWKH', // Replace GA_MEASUREMENT_ID with your actual ID
         'currency': 'USD',
         'value': 0.001,
         'comic_title': manga.title,
