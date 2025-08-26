@@ -166,7 +166,7 @@
         {#each data.comics as comic, index}
           <article class="group">
             <a 
-              href={`/comic/${comic.slug}`} 
+              href={`/hentai/${comic.slug}`} 
               class="block hover:opacity-90 transition-opacity duration-200 focus:ring-2 focus:ring-pink-500 focus:outline-none rounded-lg"
               aria-label="Read {comic.title}"
             >
