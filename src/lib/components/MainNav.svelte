@@ -85,7 +85,7 @@
 							<input
 								type="search"
 								bind:value={search}
-								placeholder="Search..."
+								placeholder="Search NHentai.Pics..."
 								class="w-full rounded-full text-xs sm:text-sm placeholder:text-gray-400 bg-[#343434] text-white px-3 sm:px-4 py-1.5 sm:py-2 pr-8 sm:pr-10 border border-white/20 focus:border-white/40 focus:outline-none transition-colors"
 							/>
 							<button
