@@ -37,6 +37,47 @@
     const queryLower = query.toLowerCase();
     return tags.filter(tag => tag.toLowerCase().includes(queryLower));
   }
+
+  // Improved pagination logic
+  function getPaginationPages(currentPage: number, totalPages: number): (number | string)[] {
+    const pages: (number | string)[] = [];
+    const delta = 2; // Number of pages to show on each side of current page
+    
+    // Always show first page
+    if (totalPages > 1) {
+      pages.push(1);
+    }
+    
+    // Calculate range around current page
+    const rangeStart = Math.max(2, currentPage - delta);
+    const rangeEnd = Math.min(totalPages - 1, currentPage + delta);
+    
+    // Add ellipsis after first page if needed
+    if (rangeStart > 2) {
+      pages.push('...');
+    }
+    
+    // Add pages around current page
+    for (let i = rangeStart; i <= rangeEnd; i++) {
+      if (i !== 1 && i !== totalPages) { // Don't duplicate first/last pages
+        pages.push(i);
+      }
+    }
+    
+    // Add ellipsis before last page if needed
+    if (rangeEnd < totalPages - 1) {
+      pages.push('...');
+    }
+    
+    // Always show last page if it's different from first
+    if (totalPages > 1) {
+      pages.push(totalPages);
+    }
+    
+    return pages;
+  }
+
+  $: paginationPages = getPaginationPages(data.page, data.totalPages);
 </script>
 
 <svelte:head>
@@ -123,19 +164,12 @@
                 </div>
               {/if}
             {/if}
-
-            <!-- Debug: Show relevance score in development -->
-            {#if comic.relevanceScore !== undefined && comic.relevanceScore > 0}
-              <!-- <div class="text-xs text-gray-500 text-center mt-1">
-                Score: {comic.relevanceScore}
-              </div> -->
-            {/if}
           </div>
         </div>
       {/each}
     </div>
 
-    <!-- Pagination -->
+    <!-- Improved Pagination -->
     {#if data.totalPages > 1}
       <div class="mt-10">
         <!-- Previous/Next navigation for mobile -->
@@ -151,6 +185,10 @@
             <div></div>
           {/if}
           
+          <span class="text-sm text-gray-400">
+            Page {data.page} of {data.totalPages}
+          </span>
+          
           {#if data.page < data.totalPages}
             <a
               href={`/search?q=${encodeURIComponent(data.query)}&page=${data.page + 1}`}
@@ -164,44 +202,45 @@
         </div>
 
         <!-- Full pagination for desktop -->
-        <div class="hidden md:flex flex-wrap gap-2 justify-center">
+        <div class="hidden md:flex items-center justify-center gap-2">
+          <!-- Previous button -->
           {#if data.page > 1}
             <a
-              href={`/search?q=${encodeURIComponent(data.query)}&page=1`}
-              class="px-3 py-2 rounded border border-white text-white hover:bg-white hover:text-black transition"
+              href={`/search?q=${encodeURIComponent(data.query)}&page=${data.page - 1}`}
+              class="px-3 py-2 rounded border border-gray-500 text-white hover:bg-white hover:text-black transition"
             >
-              1
+              ← Prev
             </a>
-            {#if data.page > 3}
-              <span class="px-3 py-2 text-gray-400">...</span>
-            {/if}
           {/if}
 
-          <!-- Show pages around current page -->
-          {#each Array(Math.min(5, data.totalPages)) as _, i}
-            {@const pageNum = Math.max(1, Math.min(data.totalPages, data.page - 2 + i))}
-            {#if pageNum >= 1 && pageNum <= data.totalPages && (data.page <= 3 || pageNum >= data.page - 2) && (data.page >= data.totalPages - 2 || pageNum <= data.page + 2)}
+          <!-- Page numbers -->
+          {#each paginationPages as pageItem}
+            {#if pageItem === '...'}
+              <span class="px-3 py-2 text-gray-400">...</span>
+            {:else}
               <a
-                href={`/search?q=${encodeURIComponent(data.query)}&page=${pageNum}`}
-                class="px-3 py-2 rounded border border-white text-white hover:bg-white hover:text-black transition"
-                class:selected={data.page === pageNum}
-                class:bg-pink-600={data.page === pageNum}
-                class:border-pink-600={data.page === pageNum}
+                href={`/search?q=${encodeURIComponent(data.query)}&page=${pageItem}`}
+                class="px-3 py-2 rounded border transition"
+                class:bg-pink-600={data.page === pageItem}
+                class:border-pink-600={data.page === pageItem}
+                class:text-white={data.page === pageItem}
+                class:border-gray-500={data.page !== pageItem}
+                class:text-gray-300={data.page !== pageItem}
+                class:hover:bg-white={data.page !== pageItem}
+                class:hover:text-black={data.page !== pageItem}
               >
-                {pageNum}
+                {pageItem}
               </a>
             {/if}
           {/each}
 
+          <!-- Next button -->
           {#if data.page < data.totalPages}
-            {#if data.page < data.totalPages - 2}
-              <span class="px-3 py-2 text-gray-400">...</span>
-            {/if}
             <a
-              href={`/search?q=${encodeURIComponent(data.query)}&page=${data.totalPages}`}
-              class="px-3 py-2 rounded border border-white text-white hover:bg-white hover:text-black transition"
+              href={`/search?q=${encodeURIComponent(data.query)}&page=${data.page + 1}`}
+              class="px-3 py-2 rounded border border-gray-500 text-white hover:bg-white hover:text-black transition"
             >
-              {data.totalPages}
+              Next →
             </a>
           {/if}
         </div>
