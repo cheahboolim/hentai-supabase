@@ -14,19 +14,16 @@ export async function GET() {
       lastmod: new Date().toISOString().split('T')[0]
     });
 
-    // Browse categories sitemap (first pages)
-    sitemaps.push({
-      loc: `${SITE_URL}/sitemaps/sitemap-browse-categories.xml`,
-      lastmod: new Date().toISOString().split('T')[0]
-    });
+    // Browse categories sitemaps (one per category type)
+    const categoryTypes = ['tags', 'artists', 'categories', 'parodies', 'characters', 'languages', 'groups'];
+    for (const categoryType of categoryTypes) {
+      sitemaps.push({
+        loc: `${SITE_URL}/sitemaps/sitemap-browse-${categoryType}.xml`,
+        lastmod: new Date().toISOString().split('T')[0]
+      });
+    }
 
-    // Browse paginated pages sitemap
-    sitemaps.push({
-      loc: `${SITE_URL}/sitemaps/sitemap-browse-paginated.xml`,
-      lastmod: new Date().toISOString().split('T')[0]
-    });
-
-    // Manga galleries sitemap (chunked if needed)
+    // Manga galleries sitemap (chunked)
     const { count: totalManga } = await supabase
       .from('slug_map')
       .select('slug', { count: 'exact', head: true })
@@ -41,15 +38,14 @@ export async function GET() {
       });
     }
 
-    // Reading pages sitemaps (heavily chunked due to potential millions of URLs)
+    // Reading pages sitemaps (chunked)
     const { count: totalPages } = await supabase
       .from('pages')
       .select('id', { count: 'exact', head: true })
       .not('manga_id', 'is', null);
 
-    // Calculate chunks needed for reading pages
     const pageChunks = Math.ceil((totalPages || 0) / URLS_PER_SITEMAP);
-    const maxChunks = Math.min(pageChunks, 100); // Cap at 100 chunks
+    const maxChunks = Math.min(pageChunks, 200); // Increased cap
 
     for (let i = 0; i < maxChunks; i++) {
       sitemaps.push({

@@ -7,6 +7,10 @@ create table public.artists (
   constraint artists_slug_key unique (slug)
 ) TABLESPACE pg_default;
 
+create index IF not exists idx_artists_name on public.artists using btree (name) TABLESPACE pg_default;
+
+create index IF not exists idx_artists_name_ilike on public.artists using gin (name gin_trgm_ops) TABLESPACE pg_default;
+
 create table public.categories (
   id serial not null,
   name text not null,
@@ -15,6 +19,10 @@ create table public.categories (
   constraint categories_name_key unique (name),
   constraint categories_slug_key unique (slug)
 ) TABLESPACE pg_default;
+
+create index IF not exists idx_categories_name on public.categories using btree (name) TABLESPACE pg_default;
+
+create index IF not exists idx_categories_name_ilike on public.categories using gin (name gin_trgm_ops) TABLESPACE pg_default;
 
 create table public.characters (
   id uuid not null default gen_random_uuid (),
@@ -25,14 +33,22 @@ create table public.characters (
   constraint characters_slug_key unique (slug)
 ) TABLESPACE pg_default;
 
-create table public.groups (
-  id serial not null,
+create index IF not exists idx_characters_name on public.characters using btree (name) TABLESPACE pg_default;
+
+create index IF not exists idx_characters_name_ilike on public.characters using gin (name gin_trgm_ops) TABLESPACE pg_default;
+
+create table public.characters (
+  id uuid not null default gen_random_uuid (),
   name text not null,
-  slug text null,
-  constraint groups_pkey primary key (id),
-  constraint groups_name_key unique (name),
-  constraint groups_slug_key unique (slug)
+  slug text not null,
+  constraint characters_pkey primary key (id),
+  constraint characters_name_key unique (name),
+  constraint characters_slug_key unique (slug)
 ) TABLESPACE pg_default;
+
+create index IF not exists idx_characters_name on public.characters using btree (name) TABLESPACE pg_default;
+
+create index IF not exists idx_characters_name_ilike on public.characters using gin (name gin_trgm_ops) TABLESPACE pg_default;
 
 create table public.languages (
   id serial not null,
@@ -43,6 +59,10 @@ create table public.languages (
   constraint languages_slug_key unique (slug)
 ) TABLESPACE pg_default;
 
+create index IF not exists idx_languages_name on public.languages using btree (name) TABLESPACE pg_default;
+
+create index IF not exists idx_languages_name_ilike on public.languages using gin (name gin_trgm_ops) TABLESPACE pg_default;
+
 create table public.manga (
   id uuid not null default gen_random_uuid (),
   manga_id text not null,
@@ -52,6 +72,12 @@ create table public.manga (
   constraint manga_pkey primary key (id)
 ) TABLESPACE pg_default;
 
+create index IF not exists idx_manga_title on public.manga using btree (title) TABLESPACE pg_default;
+
+create index IF not exists idx_manga_title_ilike on public.manga using gin (title gin_trgm_ops) TABLESPACE pg_default;
+
+create index IF not exists idx_manga_created_at on public.manga using btree (created_at desc) TABLESPACE pg_default;
+
 create table public.manga_artists (
   manga_id uuid not null,
   artist_id integer not null,
@@ -59,6 +85,10 @@ create table public.manga_artists (
   constraint manga_artists_artist_id_fkey foreign KEY (artist_id) references artists (id) on delete CASCADE,
   constraint manga_artists_manga_id_fkey foreign KEY (manga_id) references manga (id) on delete CASCADE
 ) TABLESPACE pg_default;
+
+create index IF not exists idx_manga_artists_manga_id on public.manga_artists using btree (manga_id) TABLESPACE pg_default;
+
+create index IF not exists idx_manga_artists_artist_id on public.manga_artists using btree (artist_id) TABLESPACE pg_default;
 
 create table public.manga_categories (
   manga_id uuid not null,
@@ -68,6 +98,10 @@ create table public.manga_categories (
   constraint manga_categories_manga_id_fkey foreign KEY (manga_id) references manga (id) on delete CASCADE
 ) TABLESPACE pg_default;
 
+create index IF not exists idx_manga_categories_manga_id on public.manga_categories using btree (manga_id) TABLESPACE pg_default;
+
+create index IF not exists idx_manga_categories_category_id on public.manga_categories using btree (category_id) TABLESPACE pg_default;
+
 create table public.manga_characters (
   manga_id uuid not null,
   character_id uuid not null,
@@ -75,6 +109,10 @@ create table public.manga_characters (
   constraint manga_characters_character_id_fkey foreign KEY (character_id) references characters (id) on delete CASCADE,
   constraint manga_characters_manga_id_fkey foreign KEY (manga_id) references manga (id) on delete CASCADE
 ) TABLESPACE pg_default;
+
+create index IF not exists idx_manga_characters_manga_id on public.manga_characters using btree (manga_id) TABLESPACE pg_default;
+
+create index IF not exists idx_manga_characters_character_id on public.manga_characters using btree (character_id) TABLESPACE pg_default;
 
 create table public.manga_groups (
   manga_id uuid not null,
@@ -84,6 +122,10 @@ create table public.manga_groups (
   constraint manga_groups_manga_id_fkey foreign KEY (manga_id) references manga (id) on delete CASCADE
 ) TABLESPACE pg_default;
 
+create index IF not exists idx_manga_groups_manga_id on public.manga_groups using btree (manga_id) TABLESPACE pg_default;
+
+create index IF not exists idx_manga_groups_group_id on public.manga_groups using btree (group_id) TABLESPACE pg_default;
+
 create table public.manga_languages (
   manga_id uuid not null,
   language_id integer not null,
@@ -91,6 +133,10 @@ create table public.manga_languages (
   constraint manga_languages_language_id_fkey foreign KEY (language_id) references languages (id) on delete CASCADE,
   constraint manga_languages_manga_id_fkey foreign KEY (manga_id) references manga (id) on delete CASCADE
 ) TABLESPACE pg_default;
+
+create index IF not exists idx_manga_languages_manga_id on public.manga_languages using btree (manga_id) TABLESPACE pg_default;
+
+create index IF not exists idx_manga_languages_language_id on public.manga_languages using btree (language_id) TABLESPACE pg_default;
 
 create table public.manga_parodies (
   manga_id uuid not null,
@@ -100,6 +146,10 @@ create table public.manga_parodies (
   constraint manga_parodies_parody_id_fkey foreign KEY (parody_id) references parodies (id) on delete CASCADE
 ) TABLESPACE pg_default;
 
+create index IF not exists idx_manga_parodies_manga_id on public.manga_parodies using btree (manga_id) TABLESPACE pg_default;
+
+create index IF not exists idx_manga_parodies_parody_id on public.manga_parodies using btree (parody_id) TABLESPACE pg_default;
+
 create table public.manga_tags (
   manga_id uuid not null,
   tag_id integer not null,
@@ -107,6 +157,10 @@ create table public.manga_tags (
   constraint manga_tags_manga_id_fkey foreign KEY (manga_id) references manga (id) on delete CASCADE,
   constraint manga_tags_tag_id_fkey foreign KEY (tag_id) references tags (id) on delete CASCADE
 ) TABLESPACE pg_default;
+
+create index IF not exists idx_manga_tags_manga_id on public.manga_tags using btree (manga_id) TABLESPACE pg_default;
+
+create index IF not exists idx_manga_tags_tag_id on public.manga_tags using btree (tag_id) TABLESPACE pg_default;
 
 create table public.pages (
   id uuid not null default gen_random_uuid (),
@@ -126,12 +180,9 @@ create table public.parodies (
   constraint parodies_slug_key unique (slug)
 ) TABLESPACE pg_default;
 
-create table public.slug_map (
-  slug text not null,
-  manga_id uuid null,
-  constraint slug_map_pkey primary key (slug),
-  constraint slug_map_manga_id_fkey foreign KEY (manga_id) references manga (id) on delete CASCADE
-) TABLESPACE pg_default;
+create index IF not exists idx_parodies_name on public.parodies using btree (name) TABLESPACE pg_default;
+
+create index IF not exists idx_parodies_name_ilike on public.parodies using gin (name gin_trgm_ops) TABLESPACE pg_default;
 
 create table public.slug_map (
   slug text not null,
@@ -139,6 +190,8 @@ create table public.slug_map (
   constraint slug_map_pkey primary key (slug),
   constraint slug_map_manga_id_fkey foreign KEY (manga_id) references manga (id) on delete CASCADE
 ) TABLESPACE pg_default;
+
+create index IF not exists idx_slug_map_manga_id on public.slug_map using btree (manga_id) TABLESPACE pg_default;
 
 create table public.tags (
   id serial not null,

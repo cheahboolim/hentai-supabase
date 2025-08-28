@@ -3,7 +3,6 @@ import { supabase } from '$lib/supabaseClient';
 
 const SITE_URL = 'https://nhentai.pics';
 const URLS_PER_SITEMAP = 25000;
-const MAX_PAGES_PER_MANGA = 100; // Reasonable limit
 
 interface SitemapUrl {
   loc: string;
@@ -20,94 +19,42 @@ export async function GET({ params }) {
 
   try {
     const urls: SitemapUrl[] = [];
+    const offset = index * URLS_PER_SITEMAP;
     
-    // Calculate how many manga we need to skip to get to this chunk
-    const estimatedPagesPerManga = 20; // Average estimate
-    const mangaPerChunk = Math.floor(URLS_PER_SITEMAP / estimatedPagesPerManga);
-    const mangaOffset = index * mangaPerChunk;
-
-    // Get batch of manga
-    const { data: mangaBatch } = await supabase
-      .from('slug_map')
+    // FIXED: Simplified approach - get pages directly with slug information
+    const { data: pageData } = await supabase
+      .from('pages')
       .select(`
-        slug,
         manga_id,
-        manga!inner(created_at)
+        page_number,
+        manga!inner(
+          created_at,
+          slug_map!inner(slug)
+        )
       `)
-      .not('slug', 'is', null)
-      .neq('slug', '')
+      .not('manga_id', 'is', null)
       .order('manga_id')
-      .range(mangaOffset, mangaOffset + mangaPerChunk - 1);
+      .order('page_number')
+      .range(offset, offset + URLS_PER_SITEMAP - 1);
 
-    if (mangaBatch && mangaBatch.length > 0) {
-      const mangaIds = mangaBatch.map(m => m.manga_id);
-      
-      // Get all pages for these manga, ordered properly
-      const { data: allPages } = await supabase
-        .from('pages')
-        .select('manga_id, page_number')
-        .in('manga_id', mangaIds)
-        .order('manga_id')
-        .order('page_number');
-
-      // Group pages by manga_id for efficient processing
-      const pagesByManga = new Map<string, number[]>();
-      allPages?.forEach(page => {
-        if (!pagesByManga.has(page.manga_id)) {
-          pagesByManga.set(page.manga_id, []);
-        }
-        pagesByManga.get(page.manga_id)!.push(page.page_number);
-      });
-
-      // Generate URLs
-      let urlCount = 0;
-      for (const manga of mangaBatch) {
-        if (urlCount >= URLS_PER_SITEMAP) break;
-
-        const pages = pagesByManga.get(manga.manga_id) || [];
+    if (pageData) {
+      for (const page of pageData) {
+        const manga = page.manga as any;
+        const slugData = manga.slug_map;
         
-        const lastmod = (manga as any).manga?.created_at
-          ? new Date((manga as any).manga.created_at).toISOString().split('T')[0]
-          : new Date().toISOString().split('T')[0];
+        if (slugData && slugData.length > 0 && slugData[0].slug) {
+          const slug = slugData[0].slug;
+          const lastmod = manga.created_at
+            ? new Date(manga.created_at).toISOString().split('T')[0]
+            : new Date().toISOString().split('T')[0];
 
-        // FIXED: Generate URLs for ALL existing pages, not just up to max
-        // Sort pages to ensure proper order
-        const sortedPages = pages.sort((a, b) => a - b);
-        
-        for (const pageNum of sortedPages) {
-          if (urlCount >= URLS_PER_SITEMAP) break;
-          if (pageNum > MAX_PAGES_PER_MANGA) break; // Respect the limit
-          
           urls.push({
-            loc: `${SITE_URL}/hentai/${manga.slug}/${pageNum}`,
+            loc: `${SITE_URL}/hentai/${slug}/${page.page_number}`,
             lastmod,
             changefreq: 'monthly',
-            priority: pageNum === 1 ? '0.6' : '0.4'
+            priority: page.page_number === 1 ? '0.6' : '0.4'
           });
-          urlCount++;
         }
-
-        // ALTERNATIVE APPROACH: If you want to generate URLs for all pages 1 to N
-        // even if some page records are missing from the database, use this instead:
-        /*
-        if (pages.length > 0) {
-          const maxPage = Math.min(
-            Math.max(...pages),
-            MAX_PAGES_PER_MANGA
-          );
-          
-          // Generate URLs for pages 1 through maxPage
-          for (let pageNum = 1; pageNum <= maxPage && urlCount < URLS_PER_SITEMAP; pageNum++) {
-            urls.push({
-              loc: `${SITE_URL}/hentai/${manga.slug}/${pageNum}`,
-              lastmod,
-              changefreq: 'monthly',
-              priority: pageNum === 1 ? '0.6' : '0.4'
-            });
-            urlCount++;
-          }
-        }
-        */
       }
     }
 

@@ -18,6 +18,7 @@ export async function GET({ params }) {
   }
 
   try {
+    // FIXED: Removed the .limit(1000) that was capping your results
     const { data: mangaData } = await supabase
       .from('slug_map')
       .select(`
