@@ -14,27 +14,8 @@
 
   export let data: {
     slug: string;
-    manga: { 
-      id: string; 
-      title: string; 
-      tagIds: number[]; 
-      tagNames: string[];
-      characterNames: string[];
-      parodyNames: string[];
-      artistNames: string[];
-      seoData: {
-        topCharacters: string[];
-        topTags: string[];
-        topParody: string;
-        primaryArtist: string;
-      };
-    };
-    images: Array<{
-      url: string;
-      alt: string;
-      title: string;
-      pageNumber: number;
-    }>;
+    manga: { id: string; title: string; tagIds: number[]; tagNames: string[] };
+    images: string[];
     currentPage: number;
     totalPages: number;
     randomComics: any[];
@@ -45,21 +26,7 @@
       prev?: string;
       next?: string;
       keywords: string;
-      ogTitle: string;
-      ogDescription: string;
       ogImage: string;
-      ogType: string;
-      ogSiteName: string;
-      ogLocale: string;
-      articleAuthor: string;
-      articlePublishedTime: string;
-      articleSection: string;
-      articleTags: string[];
-      twitterCard: string;
-      twitterTitle: string;
-      twitterDescription: string;
-      twitterImage: string;
-      twitterSite: string;
       jsonLd: any;
     };
   };
@@ -69,8 +36,6 @@
 
   // Track current page from URL params - this is the fix!
   let currentPage = data.currentPage;
-  let showShareOptions = false;
-  
   $: {
     const urlPage = Number($page.params.page);
     if (!isNaN(urlPage) && urlPage !== currentPage) {
@@ -102,8 +67,6 @@
         'comic_title': manga.title,
         'page_number': currentPage,
         'total_pages': totalPages,
-        'characters': manga.seoData.topCharacters.join(','),
-        'tags': manga.seoData.topTags.join(','),
         'currency': 'USD',
         'value': 0.001,
         'custom_parameter_1': 'comic_engagement'
@@ -244,32 +207,6 @@
     // Middle third does nothing (prevents accidental navigation)
   }
 
-  // Share functionality
-  function copyPageUrl() {
-    navigator.clipboard.writeText(window.location.href);
-    // Show feedback
-    const button = document.querySelector('[data-copy-button]');
-    if (button) {
-      const originalText = button.textContent;
-      button.textContent = '✅ Copied!';
-      setTimeout(() => {
-        button.textContent = originalText;
-      }, 2000);
-    }
-  }
-
-  function shareToTwitter() {
-    const text = `📖 Reading ${manga.title} page ${currentPage}! ${manga.seoData.topCharacters.length > 0 ? `${manga.seoData.topCharacters[0]} ` : ''}${manga.seoData.topTags.slice(0,2).join(' ')} content!`;
-    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(window.location.href)}`;
-    window.open(url, '_blank', 'width=550,height=420');
-  }
-
-  function shareToReddit() {
-    const title = `${manga.title} - Page ${currentPage}/${totalPages}${manga.seoData.topCharacters.length > 0 ? ` [${manga.seoData.topCharacters[0]}]` : ''}`;
-    const url = `https://reddit.com/submit?title=${encodeURIComponent(title)}&url=${encodeURIComponent(window.location.href)}`;
-    window.open(url, '_blank');
-  }
-
   // Dynamic page title for browser tab
   let pageTitle: string;
   $: pageTitle = currentPage === 1
@@ -283,49 +220,20 @@
   <meta name="keywords" content={data.seo.keywords} />
   <link rel="canonical" href={data.seo.canonical} />
   
-  <!-- Enhanced Open Graph -->
-  <meta property="og:type" content={data.seo.ogType} />
-  <meta property="og:site_name" content={data.seo.ogSiteName} />
-  <meta property="og:locale" content={data.seo.ogLocale} />
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
   <meta property="og:url" content={data.seo.canonical} />
-  <meta property="og:title" content={data.seo.ogTitle} />
-  <meta property="og:description" content={data.seo.ogDescription} />
+  <meta property="og:title" content={data.seo.title} />
+  <meta property="og:description" content={data.seo.description} />
   <meta property="og:image" content={data.seo.ogImage} />
-  <meta property="og:image:secure_url" content={data.seo.ogImage} />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
-  <meta property="og:image:alt" content="{manga.title} page {currentPage} - {manga.seoData.topTags.slice(0,2).join(' ')} hentai manga" />
+  <meta property="og:site_name" content="NHentai" />
   
-  <!-- Article-specific OG tags -->
-  {#if data.seo.articleAuthor}
-    <meta property="article:author" content={data.seo.articleAuthor} />
-  {/if}
-  <meta property="article:published_time" content={data.seo.articlePublishedTime} />
-  <meta property="article:section" content={data.seo.articleSection} />
-  {#each data.seo.articleTags as tag}
-    <meta property="article:tag" content={tag} />
-  {/each}
-  
-  <!-- Enhanced Twitter Cards -->
-  <meta name="twitter:card" content={data.seo.twitterCard} />
-  <meta name="twitter:site" content={data.seo.twitterSite} />
-  <meta name="twitter:title" content={data.seo.twitterTitle} />
-  <meta name="twitter:description" content={data.seo.twitterDescription} />
-  <meta name="twitter:image" content={data.seo.twitterImage} />
-  <meta name="twitter:image:alt" content="{manga.title} page {currentPage} - read online free" />
-  
-  <!-- Twitter Labels for Rich Cards -->
-  <meta name="twitter:label1" content="Progress" />
-  <meta name="twitter:data1" content="{currentPage} of {totalPages} pages" />
-  {#if manga.seoData.topCharacters.length > 0}
-    <meta name="twitter:label2" content="Characters" />
-    <meta name="twitter:data2" content={manga.seoData.topCharacters.slice(0,2).join(', ')} />
-  {/if}
-  
-  <!-- Additional SEO -->
-  <meta name="robots" content="index, follow, max-image-preview:large" />
-  <meta name="author" content={manga.seoData.primaryArtist || 'NHentai Pics'} />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:url" content={data.seo.canonical} />
+  <meta name="twitter:title" content={data.seo.title} />
+  <meta name="twitter:description" content={data.seo.description} />
+  <meta name="twitter:image" content={data.seo.ogImage} />
   
   <!-- Pagination -->
   {#if data.seo.prev}
@@ -362,98 +270,32 @@
       ← Back to Gallery
     </a>
     
-    <!-- Page indicator with enhanced SEO info -->
-    <div class="text-gray-300 text-sm flex flex-col sm:flex-row items-center gap-2">
-      <span>Page {currentPage} of {totalPages}</span>
-      {#if manga.seoData.topCharacters.length > 0}
-        <span class="text-pink-400">• {manga.seoData.topCharacters[0]}</span>
-      {/if}
-      {#if manga.seoData.topParody}
-        <span class="text-blue-400">• {manga.seoData.topParody}</span>
-      {/if}
+    <!-- Page indicator -->
+    <div class="text-gray-300 text-sm">
+      Page {currentPage} of {totalPages}
     </div>
   </div>
 
-  <!-- Enhanced title with more SEO context -->
+  <!-- Enhanced title with more context -->
   <header class="mb-6 text-center">
     <h1 class="text-3xl md:text-4xl font-bold mb-2 text-white">
       {manga.title}
-      {#if manga.seoData.topCharacters.length > 0}
-        <span class="block text-xl text-pink-400 mt-2">
-          {manga.seoData.topCharacters.slice(0,2).join(' & ')}
-        </span>
-      {/if}
     </h1>
-    <div class="text-gray-400 text-sm space-y-1">
-      <p>
-        Reading Page {currentPage} 
-        {#if manga.seoData.topTags.length > 0}
-          • {manga.seoData.topTags.slice(0, 3).join(', ')}
-        {/if}
-      </p>
-      {#if manga.seoData.primaryArtist}
-        <p>by <span class="text-pink-400">{manga.seoData.primaryArtist}</span></p>
+    <p class="text-gray-400 text-sm">
+      Reading Page {currentPage} 
+      {#if manga.tagNames.length > 0}
+        • {manga.tagNames.slice(0, 3).join(', ')}
       {/if}
-    </div>
+    </p>
     <!-- Navigation hint -->
-    <p class="text-gray-500 text-xs mt-3">
+    <p class="text-gray-500 text-xs mt-2">
       💡 Click left/right sides of image to navigate • Use arrow keys
     </p>
   </header>
 
-  <!-- Share Section for Reading Pages -->
-  <div class="bg-gray-900 border border-gray-700 rounded-lg p-4 mb-6 max-w-2xl mx-auto">
-    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-      <div>
-        <h3 class="font-medium text-gray-200 mb-1">
-          📖 Reading {manga.title}? Save your progress!
-        </h3>
-        <p class="text-sm text-gray-400">
-          Copy URL to bookmark this exact page
-        </p>
-      </div>
-      
-      <div class="flex items-center gap-3">
-        <button
-          data-copy-button
-          on:click={copyPageUrl}
-          class="px-4 py-2 bg-gray-800 text-gray-300 rounded-lg hover:bg-gray-700 transition-colors text-sm font-medium"
-        >
-          📋 Copy Page URL
-        </button>
-        
-        <div class="relative">
-          <button
-            on:click={() => showShareOptions = !showShareOptions}
-            class="px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors text-sm font-medium"
-          >
-            🔗 Share
-          </button>
-          
-          {#if showShareOptions}
-            <div class="absolute right-0 top-full mt-2 bg-gray-800 border border-gray-600 rounded-lg shadow-lg z-10 min-w-[150px]">
-              <button
-                on:click={shareToTwitter}
-                class="w-full px-4 py-2 text-left hover:bg-gray-700 transition-colors text-sm flex items-center gap-2 text-gray-300"
-              >
-                🐦 Twitter
-              </button>
-              <button
-                on:click={shareToReddit}
-                class="w-full px-4 py-2 text-left hover:bg-gray-700 transition-colors text-sm flex items-center gap-2 text-gray-300"
-              >
-                🔴 Reddit
-              </button>
-            </div>
-          {/if}
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Enhanced images with SEO-rich alt tags -->
+  <!-- Enhanced images with click navigation -->
   <section class="space-y-4 mb-8" aria-label="Manga pages">
-    {#each data.images as imageData, idx}
+    {#each data.images as url, idx}
       <div class="relative group">
         <div
           class="relative cursor-pointer select-none"
@@ -463,9 +305,8 @@
           aria-label="Click left or right to navigate pages"
         >
           <img
-            src={imageData.url}
-            alt={imageData.alt}
-            title={imageData.title}
+            src={url}
+            alt={`${manga.title} - Page ${(currentPage - 1) * IMAGES_PER_PAGE + idx + 1}`}
             class="w-full rounded-lg shadow-lg"
             loading="lazy"
             decoding="async"
@@ -500,12 +341,9 @@
           </div>
         </div>
         
-        <!-- Enhanced page number overlay with SEO keywords -->
+        <!-- Page number overlay -->
         <div class="absolute bottom-2 right-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs">
-          <div>Page {imageData.pageNumber}</div>
-          {#if manga.seoData.topTags.length > 0}
-            <div class="text-pink-300 text-xs">#{manga.seoData.topTags[0]}</div>
-          {/if}
+          Page {(currentPage - 1) * IMAGES_PER_PAGE + idx + 1}
         </div>
       </div>
     {/each}
@@ -570,44 +408,30 @@
     </a>
   </nav>
 
-  <!-- Content sections with improved spacing -->
-  <div class="space-y-12">
-    <!-- Ad placement with better spacing -->
-    <div class="my-16">
-      <AAdsMiddleBanner />
-    </div>
-    
-    <!-- Similar Manga Widget with improved spacing -->
-    <section aria-label="Similar manga recommendations" class="mt-16">
+  <!-- Content sections with better spacing -->
+  <div class="space-y-8">
+    <AAdsMiddleBanner />
+    <!-- Similar Manga Widget -->
+    <section aria-label="Similar manga recommendations">
       <SimilarManga 
         tagIds={manga.tagIds} 
         currentMangaId={manga.id} 
       />
     </section>
 
-    <!-- Ad section with spacing -->
-    <div class="mt-16">
-      <AAdsBanner />
-    </div>
+    <AAdsBanner />
     
-    <!-- Hot Now Widget with improved spacing -->
-    <section aria-label="Popular manga" class="mt-16">
+    <!-- Hot Now Widget -->
+    <section aria-label="Popular manga">
       <RandomPost comics={data.randomComics} />
     </section>
 
-    <!-- Final ad section -->
-    <section aria-label="Advertisement" class="mt-16">
+    <!-- Ad section -->
+    <section aria-label="Advertisement">
       <NativeAds />
     </section>
   </div>
 </main>
-
-<!-- Close share dropdown when clicking outside -->
-<svelte:window on:click={(e) => {
-  if (!e.target.closest('[data-share-container]')) {
-    showShareOptions = false;
-  }
-}} />
 
 <style>
   /* Enhanced visual hierarchy */
@@ -619,12 +443,5 @@
   /* Smooth transitions for better UX */
   * {
     transition: all 0.2s ease;
-  }
-  
-  /* Focus styles for better accessibility */
-  button:focus-visible,
-  a:focus-visible {
-    outline: 2px solid #ec4899;
-    outline-offset: 2px;
   }
 </style>

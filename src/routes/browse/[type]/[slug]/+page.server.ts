@@ -96,14 +96,51 @@ export const load: PageServerLoad = async ({ params, url }) => {
 		throw error(500, 'Failed to fetch slug mappings');
 	}
 
-	// 6. Map manga and slugs into final result
-	const comics = manga.map((item) => ({
-		id: item.id,
-		title: item.title,
-		slug: slugs.find((s) => s.manga_id === item.id)?.slug ?? '',
-		featureImage: item.feature_image_url,
-		author: { name: 'Unknown' }
-	}));
+	// 6. Fetch additional metadata for SEO enhancement
+	const fetchRelatedData = async () => {
+		const promises = mangaIds.map(async (mangaId) => {
+			const [artistsData, tagsData, charactersData, parodiesData] = await Promise.all([
+				supabase.from('manga_artists').select('artist_id(name)').eq('manga_id', mangaId).limit(2),
+				supabase.from('manga_tags').select('tag_id(name)').eq('manga_id', mangaId).limit(3),
+				supabase.from('manga_characters').select('character_id(name)').eq('manga_id', mangaId).limit(2),
+				supabase.from('manga_parodies').select('parody_id(name)').eq('manga_id', mangaId).limit(1)
+			]);
+
+			return {
+				mangaId,
+				artists: artistsData.data?.map(a => a.artist_id?.name).filter(Boolean) || [],
+				tags: tagsData.data?.map(t => t.tag_id?.name).filter(Boolean) || [],
+				characters: charactersData.data?.map(c => c.character_id?.name).filter(Boolean) || [],
+				parodies: parodiesData.data?.map(p => p.parody_id?.name).filter(Boolean) || []
+			};
+		});
+
+		return Promise.all(promises);
+	};
+
+	const relatedData = await fetchRelatedData();
+
+	// 7. Map manga and slugs into final result with enhanced SEO data
+	const comics = manga.map((item) => {
+		const related = relatedData.find(r => r.mangaId === item.id);
+		return {
+			id: item.id,
+			title: item.title,
+			slug: slugs.find((s) => s.manga_id === item.id)?.slug ?? '',
+			featureImage: item.feature_image_url,
+			author: { name: related?.artists[0] || 'Unknown' },
+			// Enhanced SEO metadata
+			seoData: {
+				artists: related?.artists || [],
+				tags: related?.tags || [],
+				characters: related?.characters || [],
+				parodies: related?.parodies || [],
+				// Generate rich alt text for images
+				imageAlt: `${item.title}${related?.characters.length ? ` - ${related.characters[0]}` : ''}${related?.parodies.length ? ` ${related.parodies[0]} parody` : ''} hentai manga${related?.tags.length ? ` featuring ${related.tags.slice(0,2).join(' ')}` : ''} by ${related?.artists[0] || 'unknown artist'}`,
+				imageTitle: `Read ${item.title} online free${related?.characters.length ? ` - ${related.characters[0]} adult manga` : ''}${related?.tags.length ? ` - ${related.tags[0]} doujinshi` : ''}`
+			}
+		};
+	});
 
 	// Enhanced SEO data
 	const typeLabel = typeLabels[type] || type;
@@ -112,28 +149,51 @@ export const load: PageServerLoad = async ({ params, url }) => {
 		`https://nhentai.pics/browse/${type}/${slug}` : 
 		`https://nhentai.pics/browse/${type}/${slug}?page=${page}`;
 
+	// Get popular characters/tags for this category for enhanced descriptions
+	const topCharacters = comics.map(c => c.seoData.characters).flat().filter(Boolean);
+	const topTags = comics.map(c => c.seoData.tags).flat().filter(Boolean);
+	const topParodies = comics.map(c => c.seoData.parodies).flat().filter(Boolean);
+
 	// Generate dynamic descriptions based on type
 	const generateDescription = () => {
 		const pageInfo = page > 1 ? ` - Page ${page}` : '';
+		const popChars = topCharacters.slice(0,2).join(', ');
+		const popTags = topTags.slice(0,3).join(', ');
+		
 		switch (type) {
 			case 'tags':
-				return `Browse ${totalManga} hentai with ${meta.name} tag${pageInfo}. Find doujinshi and hentai manga featuring ${meta.name.toLowerCase()} content.`;
+				return `🔞 Browse ${totalManga} premium ${meta.name} hentai manga${pageInfo}. ${popChars ? `Featuring ${popChars} characters, ` : ''}free adult doujinshi with high-quality artwork. Read online instantly!`;
 			case 'artists':
-				return `Discover ${totalManga} hentai by artist ${meta.name}${pageInfo}. Read all works from this talented hentai creator.`;
+				return `🎨 Discover ${totalManga} exclusive hentai by artist ${meta.name}${pageInfo}. ${popTags ? `${popTags} content, ` : ''}premium adult manga collection. Free reading, no signup required!`;
 			case 'parodies':
-				return `Read ${totalManga} ${meta.name} parody hentai${pageInfo}. Fan-made doujinshi and adult content based on ${meta.name}.`;
+				return `📚 Read ${totalManga} ${meta.name} parody hentai${pageInfo}. ${popChars ? `${popChars} characters, ` : ''}fan-made adult doujinshi based on popular anime. Free online access!`;
 			case 'characters':
-				return `Find ${totalManga} hentai featuring ${meta.name}${pageInfo}. Browse doujinshi with this popular character.`;
+				return `💕 Find ${totalManga} hentai featuring ${meta.name}${pageInfo}. ${popTags ? `${popTags} themes, ` : ''}premium adult manga with your favorite character. Read free online!`;
 			case 'categories':
-				return `Explore ${totalManga} hentai in ${meta.name} category${pageInfo}. Discover content in this genre.`;
+				return `📖 Explore ${totalManga} ${meta.name} category hentai${pageInfo}. ${popChars ? `${popChars} characters, ` : ''}curated adult manga collection. High-quality content, free access!`;
 			case 'languages':
-				return `Read ${totalManga} hentai in ${meta.name}${pageInfo}. Browse content in your preferred language.`;
+				return `🌍 Read ${totalManga} hentai in ${meta.name}${pageInfo}. ${popTags ? `${popTags} content, ` : ''}translated adult manga in your preferred language. Free online reader!`;
 			case 'groups':
-				return `Browse ${totalManga} hentai by ${meta.name} group${pageInfo}. Quality translations and releases.`;
+				return `👥 Browse ${totalManga} hentai by ${meta.name} group${pageInfo}. ${popChars ? `${popChars} characters, ` : ''}quality translations and premium releases. Read free online!`;
 			default:
-				return `Browse ${totalManga} hentai in ${meta.name}${pageInfo}.`;
+				return `Browse ${totalManga} hentai in ${meta.name}${pageInfo}. Free adult manga collection online.`;
 		}
 	};
+
+	// Enhanced social sharing data
+	const socialTitle = page === 1 ? 
+		`🔥 ${totalManga} ${meta.name} Hentai Manga | Free Online | NHentai` :
+		`${meta.name} Hentai - Page ${page} | ${totalManga} Free Adult Manga`;
+
+	const socialDescription = generateDescription().replace(/🔞|🎨|📚|💕|📖|🌍|👥/g, '').trim();
+
+	// Multiple OG images for variety
+	const ogImages = [
+		comics[0]?.featureImage,
+		comics[1]?.featureImage,
+		comics[2]?.featureImage,
+		`/images/og-${type}-default.jpg`
+	].filter(Boolean);
 
 	return {
 		type,
@@ -144,22 +204,44 @@ export const load: PageServerLoad = async ({ params, url }) => {
 		totalPages,
 		totalManga,
 		typeLabel,
+		// Enhanced metadata
+		popularContent: {
+			characters: [...new Set(topCharacters)].slice(0, 5),
+			tags: [...new Set(topTags)].slice(0, 5),
+			parodies: [...new Set(topParodies)].slice(0, 3)
+		},
 		seo: {
 			title: page === 1 ? 
-				`${meta.name} ${typeLabel} - ${totalManga} Manga | nHentai` :
-				`${meta.name} ${typeLabel} - Page ${page} of ${totalPages} | nHentai`,
+				`${meta.name} ${typeLabel} Hentai - ${totalManga} Free Adult Manga | NHentai` :
+				`${meta.name} ${typeLabel} - Page ${page} | ${totalManga} Free Hentai Manga`,
 			description: generateDescription(),
 			canonical: canonicalUrl,
-			keywords: `${meta.name.toLowerCase()}, ${type}, manga, doujinshi, hentai, adult manga, ${meta.name.toLowerCase()} manga`,
-			ogTitle: `${meta.name} ${typeLabel} - ${totalManga} Manga`,
-			ogDescription: generateDescription(),
-			ogImage: comics[0]?.featureImage || '`https://nhentai.pics/images/browse-og.jpg',
+			keywords: `${meta.name.toLowerCase()}, ${type}, hentai, manga, doujinshi, adult manga, free online, ${topCharacters.slice(0,3).join(', ').toLowerCase()}, ${topTags.slice(0,3).join(', ').toLowerCase()}`,
+			// Enhanced Open Graph
+			ogTitle: socialTitle,
+			ogDescription: socialDescription,
+			ogImages: ogImages,
+			ogType: 'website',
+			ogSiteName: 'NHentai Pics - Free Adult Manga',
+			ogLocale: 'en_US',
+			// Twitter Card enhancements
+			twitterTitle: socialTitle,
+			twitterDescription: socialDescription,
+			twitterCard: 'summary_large_image',
+			twitterSite: '@nhentaipics',
+			// Additional metadata
 			structuredData: {
 				'@context': 'https://schema.org',
 				'@type': 'CollectionPage',
 				name: `${meta.name} ${typeLabel} Collection`,
-				description: generateDescription(),
+				description: socialDescription,
 				url: canonicalUrl,
+				image: ogImages[0],
+				about: {
+					'@type': 'Thing',
+					name: meta.name,
+					description: `${typeLabel} featuring adult manga content`
+				},
 				mainEntity: {
 					'@type': 'ItemList',
 					numberOfItems: totalManga,
@@ -168,14 +250,17 @@ export const load: PageServerLoad = async ({ params, url }) => {
 						position: (page - 1) * PAGE_SIZE + index + 1,
 						item: {
 							'@type': 'Book',
-							'@id': `https://nhentai.pics/comic/${comic.slug}`,
+							'@id': `https://nhentai.pics/hentai/${comic.slug}`,
 							name: comic.title,
-							url: `https://nhentai.pics/comic/${comic.slug}`,
+							url: `https://nhentai.pics/hentai/${comic.slug}`,
 							image: comic.featureImage,
 							author: {
 								'@type': 'Person',
 								name: comic.author.name
-							}
+							},
+							genre: comic.seoData.tags,
+							character: comic.seoData.characters,
+							about: comic.seoData.parodies
 						}
 					}))
 				},
@@ -186,13 +271,13 @@ export const load: PageServerLoad = async ({ params, url }) => {
 							'@type': 'ListItem',
 							position: 1,
 							name: 'Home',
-							item: '`https://nhentai.pics'
+							item: 'https://nhentai.pics'
 						},
 						{
 							'@type': 'ListItem',
 							position: 2,
 							name: 'Browse',
-							item: '`https://nhentai.pics/browse'
+							item: 'https://nhentai.pics/browse'
 						},
 						{
 							'@type': 'ListItem',

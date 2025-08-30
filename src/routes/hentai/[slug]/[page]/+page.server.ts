@@ -26,36 +26,47 @@ export async function load({ params, url: _url }) {
   // 2) Fetch the manga's basic info (using your existing schema)
   const { data: manga, error: mangaErr } = await supabase
     .from('manga')
-    .select('id, title, feature_image_url')
+    .select('id, manga_id, title, feature_image_url, created_at')
     .eq('id', mangaId)
     .single();
   if (mangaErr || !manga) throw error(404, 'Manga record missing');
 
-  // 3) Fetch tag IDs from the join table (keeping original approach)
-  const { data: tagRows, error: tagErr } = await supabase
-    .from('manga_tags')
-    .select('tag_id')
-    .eq('manga_id', mangaId);
-  if (tagErr) throw error(500, 'Failed to load tags');
-  const tagIds = (tagRows || []).map((r) => r.tag_id);
+  // 3) Fetch enhanced metadata for SEO
+  async function fetchRelated<T extends string>(
+    joinTable: string,
+    foreignKey: T,
+    limit: number = 5
+  ) {
+    const { data } = await supabase
+      .from(joinTable)
+      .select(`${foreignKey}(id, name, slug)`)
+      .eq('manga_id', mangaId)
+      .limit(limit);
 
-  // 4) Fetch tag names separately if we have tag IDs
-  let tagNames: string[] = [];
-  if (tagIds.length > 0) {
-    const { data: tags, error: tagsErr } = await supabase
-      .from('tags')
-      .select('name')
-      .in('id', tagIds);
-    if (!tagsErr && tags) {
-      tagNames = tags.map((tag) => tag.name);
-    }
+    return (data || [])
+      .map((row: any) => row[foreignKey])
+      .filter(Boolean)
+      .map((item: any) => ({ id: item.id, name: item.name, slug: item.slug }));
   }
 
-  // 5) Pagination parameters
+  const [artists, tags, characters, parodies] = await Promise.all([
+    fetchRelated('manga_artists', 'artist_id', 2),
+    fetchRelated('manga_tags', 'tag_id', 5),
+    fetchRelated('manga_characters', 'character_id', 3),
+    fetchRelated('manga_parodies', 'parody_id', 2)
+  ]);
+
+  // Extract names for SEO
+  const tagNames = tags.map(t => t.name);
+  const characterNames = characters.map(c => c.name);
+  const parodyNames = parodies.map(p => p.name);
+  const artistNames = artists.map(a => a.name);
+
+  // 4) Pagination parameters
   const IMAGES_PER_PAGE = 1;
   const offset = (pageNum - 1) * IMAGES_PER_PAGE;
 
-  // 6) Pull that page's images
+  // 5) Pull that page's images
   const { data: pages, error: pagesErr, count } = await supabase
     .from('pages')
     .select('image_url', { count: 'exact' })
@@ -72,7 +83,7 @@ export async function load({ params, url: _url }) {
     throw error(404, 'Page not found');
   }
 
-  // 7) Fetch 8 random comics for the "Hot Now" widget
+  // 6) Fetch 8 random comics for the "Hot Now" widget
   const RANDOM_LIMIT = 8;
   const randomSeed = Math.floor(Math.random() * 1000000);
 
@@ -130,75 +141,154 @@ export async function load({ params, url: _url }) {
     }
   }
 
-  // 8) Generate comprehensive SEO metadata on server-side
-  const baseTitle = manga.title;
-  const siteTitle = "NHentai";
-  const separator = " | ";
-  
-  // More descriptive and unique titles
-  const seoTitle = pageNum === 1
-    ? `Read ${baseTitle} Online Free - Chapter ${pageNum}${separator}${siteTitle}`
-    : `${baseTitle} - Page ${pageNum} Online Reader${separator}${siteTitle}`;
+  // 7) Enhanced SEO data generation
+  const topCharacters = characterNames.slice(0, 2);
+  const topTags = tagNames.slice(0, 3);
+  const topParody = parodyNames[0] || '';
+  const primaryArtist = artistNames[0] || '';
 
-  // Rich description with more context
-  const seoDescription = pageNum === 1
-    ? `Read ${baseTitle} manga online for free at NHentai. High quality translated manga with fast updates.${tagNames.length > 0 ? ` Available genres: ${tagNames.slice(0, 3).join(', ')}.` : ''}`
-    : `Continue reading ${baseTitle} - Page ${pageNum} at NHentai. Free online manga reader with high quality images and fast loading.`;
-
-  // Canonical URL
-  const canonical = `https://nhentai.pics/hentai/${slug}/${pageNum}`;
-
-  // Pagination links
-  const prev = pageNum > 1
-    ? `/hentai/${slug}/${pageNum - 1}`
-    : undefined;
-
-  const next = pageNum < totalPages
-    ? `/hentai/${slug}/${pageNum + 1}`
-    : undefined;
-
-  // Open Graph and Twitter metadata
-  const ogImage = pages[0]?.image_url || manga.feature_image_url || '/default-manga-cover.jpg';
-  
-  // JSON-LD structured data for better SEO
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "ComicSeries",
-    "name": manga.title,
-    "description": seoDescription,
-    "url": `https://nhentai.pics/hentai/${slug}`,
-    "image": ogImage,
-    "genre": tagNames,
-    "numberOfEpisodes": totalPages,
-    "publisher": {
-      "@type": "Organization",
-      "name": siteTitle,
-      "url": "`https://nhentai.pics"
-    }
+  // Generate enhanced image alt text for the reading page
+  const generateImageAlt = (pageIndex: number) => {
+    const actualPageNum = (pageNum - 1) * IMAGES_PER_PAGE + pageIndex + 1;
+    let alt = `${manga.title} page ${actualPageNum}`;
+    if (topCharacters.length > 0) alt += ` featuring ${topCharacters[0]}`;
+    if (topParody) alt += ` ${topParody} parody`;
+    if (topTags.length > 0) alt += ` - ${topTags.slice(0,2).join(' ')} hentai manga`;
+    alt += ' - read online free';
+    return alt;
   };
+
+  const generateImageTitle = (pageIndex: number) => {
+    const actualPageNum = (pageNum - 1) * IMAGES_PER_PAGE + pageIndex + 1;
+    let title = `Read ${manga.title} page ${actualPageNum} online`;
+    if (topCharacters.length > 0) title += ` - ${topCharacters[0]} adult manga`;
+    if (topTags.length > 0) title += ` - ${topTags[0]} doujinshi`;
+    return title;
+  };
+
+  // Enhanced SEO descriptions
+  const generateSEODescription = () => {
+    let desc = `📖 Read ${manga.title} page ${pageNum} of ${totalPages} online free! `;
+    if (topCharacters.length > 0) {
+      desc += `${topCharacters.join(' and ')} characters`;
+      if (topParody) desc += ` from ${topParody}`;
+      desc += '. ';
+    }
+    if (topTags.length > 0) desc += `${topTags.slice(0,2).join(', ')} content. `;
+    desc += 'High-quality hentai manga reader, mobile-friendly! 🔞';
+    return desc;
+  };
+
+  // Social sharing optimized titles
+  const socialTitle = pageNum === 1
+    ? `🔞 ${manga.title}${topCharacters.length > 0 ? ` - ${topCharacters[0]}` : ''} | Chapter 1 | Free Hentai Reader`
+    : `${manga.title} - Page ${pageNum}${topCharacters.length > 0 ? ` | ${topCharacters[0]}` : ''} | Free Online`;
+
+  const socialDescription = generateSEODescription().replace(/📖|🔞/g, '').trim();
+
+  // Keywords for meta tags
+  const keywords = [
+    manga.title.toLowerCase(),
+    ...topCharacters.map(c => c.toLowerCase()),
+    ...topTags.map(t => t.toLowerCase()),
+    topParody.toLowerCase(),
+    'hentai reader', 'manga online', 'free reading', `page ${pageNum}`, 'adult manga', 'doujinshi'
+  ].filter(Boolean).join(', ');
+
+  // Canonical and navigation URLs
+  const canonical = `https://nhentai.pics/hentai/${slug}/${pageNum}`;
+  const prev = pageNum > 1 ? `/hentai/${slug}/${pageNum - 1}` : undefined;
+  const next = pageNum < totalPages ? `/hentai/${slug}/${pageNum + 1}` : undefined;
+
+  // Enhanced images array with SEO data
+  const enhancedImages = pages.map((p, index) => ({
+    url: p.image_url,
+    alt: generateImageAlt(index),
+    title: generateImageTitle(index),
+    pageNumber: (pageNum - 1) * IMAGES_PER_PAGE + index + 1
+  }));
 
   return {
     slug,
     manga: {
       id: manga.id,
+      mangaId: manga.manga_id,
       title: manga.title,
-      tagIds,
-      tagNames
+      tagIds: tags.map(t => Number(t.id)),
+      tagNames,
+      characterNames,
+      parodyNames,
+      artistNames,
+      // SEO enhancement data
+      seoData: {
+        topCharacters,
+        topTags,
+        topParody,
+        primaryArtist
+      }
     },
-    images: pages.map((p) => p.image_url),
+    images: enhancedImages,
     currentPage: pageNum,
     totalPages,
     randomComics,
     // Comprehensive SEO metadata for server-side rendering
     seo: {
-      title: seoTitle,
-      description: seoDescription,
+      title: pageNum === 1 ? 
+        `Read ${manga.title} Online Free${topCharacters.length > 0 ? ` - ${topCharacters[0]}` : ''} | Chapter 1 | NHentai` :
+        `${manga.title} - Page ${pageNum}${topCharacters.length > 0 ? ` | ${topCharacters[0]}` : ''} | Free Online Reader`,
+      description: generateSEODescription(),
       canonical,
       prev,
       next,
-      keywords: [...tagNames, manga.title, 'manga', 'read online', 'free manga'].join(', '),
-      ogImage,
-      jsonLd
+      keywords,
+      // Enhanced Open Graph
+      ogTitle: socialTitle,
+      ogDescription: socialDescription,
+      ogImage: enhancedImages[0]?.url || manga.feature_image_url,
+      ogType: 'article',
+      ogSiteName: 'NHentai Pics - Free Adult Manga Reader',
+      ogLocale: 'en_US',
+      // Article-specific OG tags
+      articleAuthor: primaryArtist,
+      articlePublishedTime: manga.created_at,
+      articleSection: 'Manga Reader',
+      articleTags: [...topTags, ...topCharacters, topParody].filter(Boolean),
+      // Twitter Card enhancements
+      twitterCard: 'summary_large_image',
+      twitterTitle: socialTitle,
+      twitterDescription: socialDescription,
+      twitterImage: enhancedImages[0]?.url || manga.feature_image_url,
+      twitterSite: '@nhentaipics',
+      // Enhanced JSON-LD structured data
+      jsonLd: {
+        "@context": "https://schema.org",
+        "@type": "ComicSeries",
+        "name": manga.title,
+        "description": socialDescription,
+        "url": `https://nhentai.pics/hentai/${slug}`,
+        "image": enhancedImages[0]?.url || manga.feature_image_url,
+        "genre": topTags,
+        "character": topCharacters,
+        "numberOfEpisodes": totalPages,
+        "datePublished": manga.created_at,
+        "publisher": {
+          "@type": "Organization",
+          "name": "NHentai Pics",
+          "url": "https://nhentai.pics"
+        },
+        "author": {
+          "@type": "Person", 
+          "name": primaryArtist || "Unknown Artist"
+        },
+        "about": topParody,
+        "episode": {
+          "@type": "ComicIssue",
+          "issueNumber": pageNum,
+          "name": `${manga.title} - Page ${pageNum}`,
+          "url": canonical,
+          "image": enhancedImages[0]?.url
+        }
+      }
     }
   };
 }
