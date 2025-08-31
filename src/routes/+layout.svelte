@@ -6,7 +6,7 @@
 	import { page } from '$app/stores';
 	import { afterNavigate } from '$app/navigation';
 	import { seo } from '$lib/seo.ts';
-
+	import AAdsMiddleBanner from '$lib/components/AAdsMiddleBanner.svelte'
 	import MainNav from '$lib/components/MainNav.svelte';
 	import Footer from '$lib/components/Footer.svelte';
 	import BannerAd from '$lib/components/adsterra/BannerAd.svelte';
@@ -94,7 +94,7 @@
 	<MainNav />
 
 	<div class="container mx-auto px-4 py-2">
-		<AAdsBanner />
+		<AAdsMiddleBanner />
 	</div>
 
 	<main class="flex-1">
