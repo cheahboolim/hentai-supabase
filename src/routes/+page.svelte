@@ -39,4 +39,7 @@
 
 <main class="max-w-6xl mx-auto px-4 py-8">
 	<RandomHome comics={data.comics} page={data.page} total={data.total} seed={data.seed} />
+	<div class="mt-12">
+		<AAdsMiddleBanner />
+	</div>
 </main>

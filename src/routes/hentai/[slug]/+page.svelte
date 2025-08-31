@@ -1,4 +1,4 @@
-<!--src\routes\hentai\[slug]\+page.svelte-->
+<!--src/routes/hentai/[slug]/+page.svelte - FIXED VERSION-->
 
 <script lang="ts">
 	import ComicPreview from '$lib/components/ComicPreview.svelte';
@@ -139,7 +139,7 @@
 					<ImageErrorRefreshButton show={featureImageError} onRefresh={refreshFeatureImage} />
 				{/if}
 
-				<!-- Share Section for Gallery -->
+				<!-- FIXED Share Section for Gallery -->
 				<div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
 					<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
 						<div>
@@ -160,7 +160,8 @@
 								📋 Copy URL
 							</button>
 							
-							<div class="relative">
+							<!-- FIXED: Added data-share-container attribute -->
+							<div class="relative" data-share-container>
 								<button
 									on:click={() => showShareOptions = !showShareOptions}
 									class="px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors text-sm font-medium"
@@ -241,21 +242,16 @@
 						<MetaGroup type="characters" label="Characters" items={comic.characters} />
 					</div>
 
-					<!-- Stats section -->
+					<!-- FIXED: Stats section - Publish date REMOVED -->
 					{#if comic.totalPages > 0}
 						<div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 mt-4">
 							<h3 class="font-medium mb-2">Manga Details</h3>
-							<div class="grid grid-cols-2 gap-4 text-sm">
+							<div class="text-sm">
 								<div>
 									<span class="text-gray-600 dark:text-gray-400">Total Pages:</span>
 									<span class="font-medium ml-2">{comic.totalPages}</span>
 								</div>
-								{#if comic.publishedAt}
-									<div>
-										<span class="text-gray-600 dark:text-gray-400">Published:</span>
-										<span class="font-medium ml-2">{new Date(comic.publishedAt).toLocaleDateString()}</span>
-									</div>
-								{/if}
+								<!-- REMOVED: Publish date section -->
 							</div>
 						</div>
 					{/if}
@@ -351,9 +347,10 @@
 	</div>
 </main>
 
-<!-- Close share dropdown when clicking outside -->
+<!-- FIXED: Close share dropdown when clicking outside -->
 <svelte:window on:click={(e) => {
-	if (!e.target.closest('[data-share-container]')) {
+	const target = e.target as Element;
+	if (!target.closest('[data-share-container]')) {
 		showShareOptions = false;
 	}
 }} />

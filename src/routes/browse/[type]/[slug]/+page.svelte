@@ -268,7 +268,7 @@
       </div>
     </div>
 
-    <!-- Share Section -->
+    <!-- FIXED Share Section -->
     <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-4 mb-6">
       <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
@@ -289,7 +289,8 @@
             📋 Copy URL
           </button>
           
-          <div class="relative">
+          <!-- FIXED: Added data-share-container attribute -->
+          <div class="relative" data-share-container>
             <button
               on:click={() => showShareOptions = !showShareOptions}
               class="px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors text-sm font-medium"
@@ -475,9 +476,10 @@
   </div>
 </main>
 
-<!-- Close share dropdown when clicking outside -->
+<!-- FIXED: Close share dropdown when clicking outside -->
 <svelte:window on:click={(e) => {
-  if (!e.target.closest('[data-share-container]')) {
+  const target = e.target as Element;
+  if (!target.closest('[data-share-container]')) {
     showShareOptions = false;
   }
 }} />

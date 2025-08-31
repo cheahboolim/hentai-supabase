@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-// src/routes/browse/[type]/[slug]/+page.server.ts
+// src/routes/browse/[type]/[slug]/+page.server.ts - FULLY OPTIMIZED
 import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 import { supabase } from '$lib/supabaseClient';
@@ -76,66 +76,94 @@ export const load: PageServerLoad = async ({ params, url }) => {
 
 	const mangaIds = rel.map((r) => r.manga_id);
 
-	// 4. Fetch manga data
-	const { data: manga, error: mangaErr } = await supabase
-		.from('manga')
-		.select('id, title, feature_image_url')
-		.in('id', mangaIds);
+	// 4. OPTIMIZED: Batch fetch all data in parallel (6 queries instead of 50+)
+	const [
+		{ data: manga, error: mangaErr },
+		{ data: slugs, error: slugErr },
+		{ data: allArtists },
+		{ data: allTags },
+		{ data: allCharacters },
+		{ data: allParodies }
+	] = await Promise.all([
+		supabase
+			.from('manga')
+			.select('id, title, feature_image_url')
+			.in('id', mangaIds),
+		supabase
+			.from('slug_map')
+			.select('slug, manga_id')
+			.in('manga_id', mangaIds),
+		supabase
+			.from('manga_artists')
+			.select('manga_id, artist_id(name)')
+			.in('manga_id', mangaIds)
+			.limit(mangaIds.length * 2),
+		supabase
+			.from('manga_tags')
+			.select('manga_id, tag_id(name)')
+			.in('manga_id', mangaIds)
+			.limit(mangaIds.length * 3),
+		supabase
+			.from('manga_characters')
+			.select('manga_id, character_id(name)')
+			.in('manga_id', mangaIds)
+			.limit(mangaIds.length * 2),
+		supabase
+			.from('manga_parodies')
+			.select('manga_id, parody_id(name)')
+			.in('manga_id', mangaIds)
+			.limit(mangaIds.length)
+	]);
 
 	if (mangaErr || !manga) {
 		throw error(500, 'Failed to fetch manga data');
 	}
 
-	// 5. Fetch slug mappings
-	const { data: slugs, error: slugErr } = await supabase
-		.from('slug_map')
-		.select('slug, manga_id')
-		.in('manga_id', mangaIds);
-
 	if (slugErr || !slugs) {
 		throw error(500, 'Failed to fetch slug mappings');
 	}
 
-	// 6. Fetch additional metadata for SEO enhancement
-	const fetchRelatedData = async () => {
-		const promises = mangaIds.map(async (mangaId) => {
-			const [artistsData, tagsData, charactersData, parodiesData] = await Promise.all([
-				supabase.from('manga_artists').select('artist_id(name)').eq('manga_id', mangaId).limit(2),
-				supabase.from('manga_tags').select('tag_id(name)').eq('manga_id', mangaId).limit(3),
-				supabase.from('manga_characters').select('character_id(name)').eq('manga_id', mangaId).limit(2),
-				supabase.from('manga_parodies').select('parody_id(name)').eq('manga_id', mangaId).limit(1)
-			]);
+	// 5. Group related data by manga_id (replaces N+1 queries)
+	const relatedDataByMangaId = mangaIds.reduce((acc, mangaId) => {
+		acc[mangaId] = {
+			artists: (allArtists || [])
+				.filter(a => a.manga_id === mangaId)
+				.map(a => a.artist_id?.name)
+				.filter(Boolean)
+				.slice(0, 2),
+			tags: (allTags || [])
+				.filter(t => t.manga_id === mangaId)
+				.map(t => t.tag_id?.name)
+				.filter(Boolean)
+				.slice(0, 3),
+			characters: (allCharacters || [])
+				.filter(c => c.manga_id === mangaId)
+				.map(c => c.character_id?.name)
+				.filter(Boolean)
+				.slice(0, 2),
+			parodies: (allParodies || [])
+				.filter(p => p.manga_id === mangaId)
+				.map(p => p.parody_id?.name)
+				.filter(Boolean)
+				.slice(0, 1)
+		};
+		return acc;
+	}, {} as Record<string, any>);
 
-			return {
-				mangaId,
-				artists: artistsData.data?.map(a => a.artist_id?.name).filter(Boolean) || [],
-				tags: tagsData.data?.map(t => t.tag_id?.name).filter(Boolean) || [],
-				characters: charactersData.data?.map(c => c.character_id?.name).filter(Boolean) || [],
-				parodies: parodiesData.data?.map(p => p.parody_id?.name).filter(Boolean) || []
-			};
-		});
-
-		return Promise.all(promises);
-	};
-
-	const relatedData = await fetchRelatedData();
-
-	// 7. Map manga and slugs into final result with enhanced SEO data
+	// 6. Map manga and slugs into final result with enhanced SEO data
 	const comics = manga.map((item) => {
-		const related = relatedData.find(r => r.mangaId === item.id);
+		const related = relatedDataByMangaId[item.id];
 		return {
 			id: item.id,
 			title: item.title,
 			slug: slugs.find((s) => s.manga_id === item.id)?.slug ?? '',
 			featureImage: item.feature_image_url,
 			author: { name: related?.artists[0] || 'Unknown' },
-			// Enhanced SEO metadata
 			seoData: {
 				artists: related?.artists || [],
 				tags: related?.tags || [],
 				characters: related?.characters || [],
 				parodies: related?.parodies || [],
-				// Generate rich alt text for images
 				imageAlt: `${item.title}${related?.characters.length ? ` - ${related.characters[0]}` : ''}${related?.parodies.length ? ` ${related.parodies[0]} parody` : ''} hentai manga${related?.tags.length ? ` featuring ${related.tags.slice(0,2).join(' ')}` : ''} by ${related?.artists[0] || 'unknown artist'}`,
 				imageTitle: `Read ${item.title} online free${related?.characters.length ? ` - ${related.characters[0]} adult manga` : ''}${related?.tags.length ? ` - ${related.tags[0]} doujinshi` : ''}`
 			}
@@ -144,12 +172,11 @@ export const load: PageServerLoad = async ({ params, url }) => {
 
 	// Enhanced SEO data
 	const typeLabel = typeLabels[type] || type;
-	const currentUrl = `https://nhentai.pics${url.pathname}${url.search}`;
 	const canonicalUrl = page === 1 ? 
 		`https://nhentai.pics/browse/${type}/${slug}` : 
 		`https://nhentai.pics/browse/${type}/${slug}?page=${page}`;
 
-	// Get popular characters/tags for this category for enhanced descriptions
+	// Get popular characters/tags for this category
 	const topCharacters = comics.map(c => c.seoData.characters).flat().filter(Boolean);
 	const topTags = comics.map(c => c.seoData.tags).flat().filter(Boolean);
 	const topParodies = comics.map(c => c.seoData.parodies).flat().filter(Boolean);
@@ -180,14 +207,12 @@ export const load: PageServerLoad = async ({ params, url }) => {
 		}
 	};
 
-	// Enhanced social sharing data
 	const socialTitle = page === 1 ? 
 		`🔥 ${totalManga} ${meta.name} Hentai Manga | Free Online | NHentai` :
 		`${meta.name} Hentai - Page ${page} | ${totalManga} Free Adult Manga`;
 
 	const socialDescription = generateDescription().replace(/🔞|🎨|📚|💕|📖|🌍|👥/g, '').trim();
 
-	// Multiple OG images for variety
 	const ogImages = [
 		comics[0]?.featureImage,
 		comics[1]?.featureImage,
@@ -204,7 +229,6 @@ export const load: PageServerLoad = async ({ params, url }) => {
 		totalPages,
 		totalManga,
 		typeLabel,
-		// Enhanced metadata
 		popularContent: {
 			characters: [...new Set(topCharacters)].slice(0, 5),
 			tags: [...new Set(topTags)].slice(0, 5),
@@ -217,19 +241,16 @@ export const load: PageServerLoad = async ({ params, url }) => {
 			description: generateDescription(),
 			canonical: canonicalUrl,
 			keywords: `${meta.name.toLowerCase()}, ${type}, hentai, manga, doujinshi, adult manga, free online, ${topCharacters.slice(0,3).join(', ').toLowerCase()}, ${topTags.slice(0,3).join(', ').toLowerCase()}`,
-			// Enhanced Open Graph
 			ogTitle: socialTitle,
 			ogDescription: socialDescription,
 			ogImages: ogImages,
 			ogType: 'website',
 			ogSiteName: 'NHentai Pics - Free Adult Manga',
 			ogLocale: 'en_US',
-			// Twitter Card enhancements
 			twitterTitle: socialTitle,
 			twitterDescription: socialDescription,
 			twitterCard: 'summary_large_image',
 			twitterSite: '@nhentaipics',
-			// Additional metadata
 			structuredData: {
 				'@context': 'https://schema.org',
 				'@type': 'CollectionPage',
