@@ -1,8 +1,16 @@
-/* New File */
 /* eslint-disable prettier/prettier */
-// src/routes/hentai/[slug]/[page]/+page.server.ts
+// src/routes/hentai/[slug]/[page]/+page.server.ts - FULLY OPTIMIZED
 import { error } from '@sveltejs/kit';
 import { supabase } from '$lib/supabaseClient';
+
+// Cache for manga metadata to reduce repeated queries
+let metadataCache = new Map<string, any>();
+const METADATA_CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
+
+// Cache for random comics
+let cachedRandomComics: any[] | null = null;
+let randomComicsCacheTime = 0;
+const RANDOM_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
 export async function load({ params, url: _url }) {
   const slug = params.slug;
@@ -23,56 +31,82 @@ export async function load({ params, url: _url }) {
 
   const mangaId = slugRow.manga_id;
 
-  // 2) Fetch the manga's basic info (using your existing schema)
-  const { data: manga, error: mangaErr } = await supabase
-    .from('manga')
-    .select('id, manga_id, title, feature_image_url, created_at')
-    .eq('id', mangaId)
-    .single();
-  if (mangaErr || !manga) throw error(404, 'Manga record missing');
+  // 2) OPTIMIZED: Check cache for metadata first
+  const cacheKey = mangaId;
+  const now = Date.now();
+  let cachedMetadata = metadataCache.get(cacheKey);
+  
+  if (!cachedMetadata || (now - cachedMetadata.timestamp) > METADATA_CACHE_DURATION) {
+    // Fetch fresh metadata only if not cached or expired
+    const [
+      { data: manga, error: mangaErr },
+      { data: artistsData },
+      { data: tagsData },
+      { data: charactersData },
+      { data: parodiesData }
+    ] = await Promise.all([
+      supabase
+        .from('manga')
+        .select('id, manga_id, title, feature_image_url, created_at')
+        .eq('id', mangaId)
+        .single(),
+      supabase
+        .from('manga_artists')
+        .select('artist_id(name)')
+        .eq('manga_id', mangaId)
+        .limit(2),
+      supabase
+        .from('manga_tags')
+        .select('tag_id(id, name)')
+        .eq('manga_id', mangaId)
+        .limit(5),
+      supabase
+        .from('manga_characters')
+        .select('character_id(name)')
+        .eq('manga_id', mangaId)
+        .limit(3),
+      supabase
+        .from('manga_parodies')
+        .select('parody_id(name)')
+        .eq('manga_id', mangaId)
+        .limit(2)
+    ]);
 
-  // 3) Fetch enhanced metadata for SEO
-  async function fetchRelated<T extends string>(
-    joinTable: string,
-    foreignKey: T,
-    limit: number = 5
-  ) {
-    const { data } = await supabase
-      .from(joinTable)
-      .select(`${foreignKey}(id, name, slug)`)
-      .eq('manga_id', mangaId)
-      .limit(limit);
+    if (mangaErr || !manga) throw error(404, 'Manga record missing');
 
-    return (data || [])
-      .map((row: any) => row[foreignKey])
-      .filter(Boolean)
-      .map((item: any) => ({ id: item.id, name: item.name, slug: item.slug }));
+    // Process and cache metadata
+    const tagNames = (tagsData || []).map(t => t.tag_id?.name).filter(Boolean);
+    const tagIds = (tagsData || []).map(t => t.tag_id?.id).filter(Boolean);
+    const characterNames = (charactersData || []).map(c => c.character_id?.name).filter(Boolean);
+    const parodyNames = (parodiesData || []).map(p => p.parody_id?.name).filter(Boolean);
+    const artistNames = (artistsData || []).map(a => a.artist_id?.name).filter(Boolean);
+
+    cachedMetadata = {
+      manga,
+      tagNames,
+      tagIds,
+      characterNames,
+      parodyNames,
+      artistNames,
+      timestamp: now
+    };
+    
+    metadataCache.set(cacheKey, cachedMetadata);
   }
 
-  const [artists, tags, characters, parodies] = await Promise.all([
-    fetchRelated('manga_artists', 'artist_id', 2),
-    fetchRelated('manga_tags', 'tag_id', 5),
-    fetchRelated('manga_characters', 'character_id', 3),
-    fetchRelated('manga_parodies', 'parody_id', 2)
-  ]);
+  const { manga, tagNames, tagIds, characterNames, parodyNames, artistNames } = cachedMetadata;
 
-  // Extract names for SEO
-  const tagNames = tags.map(t => t.name);
-  const characterNames = characters.map(c => c.name);
-  const parodyNames = parodies.map(p => p.name);
-  const artistNames = artists.map(a => a.name);
-
-  // 4) Pagination parameters
+  // 3) Fetch page images with count
   const IMAGES_PER_PAGE = 1;
   const offset = (pageNum - 1) * IMAGES_PER_PAGE;
 
-  // 5) Pull that page's images
   const { data: pages, error: pagesErr, count } = await supabase
     .from('pages')
     .select('image_url', { count: 'exact' })
     .eq('manga_id', mangaId)
     .order('page_number', { ascending: true })
     .range(offset, offset + IMAGES_PER_PAGE - 1);
+  
   if (pagesErr || !pages) throw error(500, 'Failed to load pages');
 
   const totalImages = count ?? pages.length;
@@ -83,65 +117,66 @@ export async function load({ params, url: _url }) {
     throw error(404, 'Page not found');
   }
 
-  // 6) Fetch 8 random comics for the "Hot Now" widget
-  const RANDOM_LIMIT = 8;
-  const randomSeed = Math.floor(Math.random() * 1000000);
-
-  // Try to use the RPC function for seeded random
-  const { data: randomManga, error: randomError } = await supabase
-    .rpc('get_random_manga', {
-      seed_value: randomSeed / 1000000,
-      limit_count: RANDOM_LIMIT,
-      offset_count: 0
-    });
-
-  // Fallback if RPC doesn't exist
-  let fallbackRandomManga;
-  if (randomError || !randomManga) {
-    console.log('RPC not available, falling back to simple random for hot widget');
-    const { data: fallback, error: fallbackError } = await supabase
-      .from('manga')
-      .select('id, title, feature_image_url')
-      .limit(RANDOM_LIMIT * 3); // Get more to shuffle from
-
-    if (fallbackError || !fallback) {
-      console.error('Error fetching random manga:', fallbackError);
-      fallbackRandomManga = [];
-    } else {
-      // Shuffle the results client-side
-      fallbackRandomManga = fallback
-        .map(item => ({ ...item, _sort: Math.random() }))
-        .sort((a, b) => a._sort - b._sort)
-        .slice(0, RANDOM_LIMIT)
-        .map(({ _sort, ...item }) => item);
-    }
-  }
-
-  const finalRandomManga = randomManga || fallbackRandomManga || [];
-
-  // Get slugs for the random manga
-  const randomMangaIds = finalRandomManga.map((m: { id: string }) => m.id);
+  // 4) OPTIMIZED: Use cached random comics if available
   let randomComics = [];
   
-  if (randomMangaIds.length > 0) {
-    const { data: randomSlugs, error: randomSlugError } = await supabase
-      .from('slug_map')
-      .select('slug, manga_id')
-      .in('manga_id', randomMangaIds);
+  if (!cachedRandomComics || (now - randomComicsCacheTime) > RANDOM_CACHE_DURATION) {
+    const RANDOM_LIMIT = 8;
+    const randomSeed = Math.floor(Math.random() * 1000000);
 
-    if (!randomSlugError && randomSlugs) {
-      // Combine random manga with slugs
-      randomComics = finalRandomManga.map((item: { id: string; title: string; feature_image_url: string }) => ({
-        id: item.id,
-        title: item.title,
-        slug: randomSlugs.find((s) => s.manga_id === item.id)?.slug ?? '',
-        featureImage: item.feature_image_url,
-        author: { name: 'Read N Hentai' }
-      }));
+    // Try RPC first, fallback if needed
+    const { data: randomManga, error: randomError } = await supabase
+      .rpc('get_random_manga', {
+        seed_value: randomSeed / 1000000,
+        limit_count: RANDOM_LIMIT,
+        offset_count: 0
+      });
+
+    let finalRandomManga = [];
+
+    if (randomError || !randomManga) {
+      // Fallback: get random manga
+      const { data: fallback, error: fallbackError } = await supabase
+        .from('manga')
+        .select('id, title, feature_image_url')
+        .limit(RANDOM_LIMIT * 2);
+
+      if (!fallbackError && fallback) {
+        finalRandomManga = fallback
+          .map(item => ({ ...item, _sort: Math.random() }))
+          .sort((a, b) => a._sort - b._sort)
+          .slice(0, RANDOM_LIMIT)
+          .map(({ _sort, ...item }) => item);
+      }
+    } else {
+      finalRandomManga = randomManga;
     }
+
+    // Get slugs for the random manga
+    if (finalRandomManga.length > 0) {
+      const randomMangaIds = finalRandomManga.map((m: { id: string }) => m.id);
+      const { data: randomSlugs, error: randomSlugError } = await supabase
+        .from('slug_map')
+        .select('slug, manga_id')
+        .in('manga_id', randomMangaIds);
+
+      if (!randomSlugError && randomSlugs) {
+        cachedRandomComics = finalRandomManga.map((item: { id: string; title: string; feature_image_url: string }) => ({
+          id: item.id,
+          title: item.title,
+          slug: randomSlugs.find((s) => s.manga_id === item.id)?.slug ?? '',
+          featureImage: item.feature_image_url,
+          author: { name: 'Read N Hentai' }
+        }));
+      }
+    }
+
+    randomComicsCacheTime = now;
   }
 
-  // 7) Enhanced SEO data generation
+  randomComics = cachedRandomComics || [];
+
+  // 5) Enhanced SEO data generation
   const topCharacters = characterNames.slice(0, 2);
   const topTags = tagNames.slice(0, 3);
   const topParody = parodyNames[0] || '';
@@ -214,7 +249,7 @@ export async function load({ params, url: _url }) {
       id: manga.id,
       mangaId: manga.manga_id,
       title: manga.title,
-      tagIds: tags.map(t => Number(t.id)),
+      tagIds,
       tagNames,
       characterNames,
       parodyNames,

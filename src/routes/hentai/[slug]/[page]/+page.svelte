@@ -1,5 +1,4 @@
-<!-- New file eslint-disable prettier/prettier */-->
-<!--src/routes/hentai/[slug]/[page]/+page.svelte-->
+<!-- src/routes/hentai/[slug]/[page]/+page.svelte - FIXED VERSION -->
 <script lang="ts">
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
@@ -67,7 +66,7 @@
   const { slug, manga, totalPages } = data;
   const IMAGES_PER_PAGE = data.images.length;
 
-  // Track current page from URL params - this is the fix!
+  // Track current page from URL params
   let currentPage = data.currentPage;
   let showShareOptions = false;
   
@@ -75,7 +74,6 @@
     const urlPage = Number($page.params.page);
     if (!isNaN(urlPage) && urlPage !== currentPage) {
       currentPage = urlPage;
-      // Track page navigation when URL changes
       trackPageView();
     }
   }
@@ -94,7 +92,6 @@
   // GA4 Tracking Function
   function trackPageView() {
     if (typeof gtag !== 'undefined') {
-      // Track comic page view with monetary value
       gtag('event', 'comic_page_view', {
         'event_category': 'engagement',
         'event_label': slug,
@@ -109,9 +106,8 @@
         'custom_parameter_1': 'comic_engagement'
       });
 
-      // Track as conversion event with value
       gtag('event', 'conversion', {
-        'send_to': 'G-PC7E1QDSXJ', // Replace GA_MEASUREMENT_ID with your actual ID
+        'send_to': 'G-PC7E1QDSXJ',
         'currency': 'USD',
         'value': 0.001,
         'comic_title': manga.title,
@@ -119,7 +115,6 @@
         'page_number': currentPage
       });
 
-      // Enhanced ecommerce tracking
       gtag('event', 'view_item', {
         'currency': 'USD',
         'value': 0.001,
@@ -136,9 +131,7 @@
     }
   }
 
-  // Use server-generated SEO data directly - no duplication!
   onMount(() => {
-    // Set the SEO metadata from server-side data
     seo.set({
       title: data.seo.title,
       description: data.seo.description,
@@ -147,28 +140,18 @@
       ...(data.seo.next && { next: data.seo.next })
     });
 
-    // Track initial page view
     trackPageView();
 
     // Preload next and previous page images
     const nextPageUrl = `/hentai/${slug}/${currentPage + 1}`;
     const prevPageUrl = `/hentai/${slug}/${currentPage - 1}`;
     
-    // Preload next/prev pages in background
     if (currentPage < totalPages) {
-      fetch(nextPageUrl).then(response => {
-        if (response.ok) {
-          // Optionally extract image URLs from response and preload them
-        }
-      }).catch(() => {});
+      fetch(nextPageUrl).catch(() => {});
     }
     
     if (currentPage > 1) {
-      fetch(prevPageUrl).then(response => {
-        if (response.ok) {
-          // Optionally extract image URLs from response and preload them
-        }
-      }).catch(() => {});
+      fetch(prevPageUrl).catch(() => {});
     }
 
     // Add keyboard navigation
@@ -188,7 +171,6 @@
 
   function goToPage(n: number) {
     if (n >= 1 && n <= totalPages) {
-      // Track navigation event
       if (typeof gtag !== 'undefined') {
         gtag('event', 'comic_navigation', {
           'event_category': 'engagement',
@@ -215,7 +197,6 @@
     const clickX = event.clientX - rect.left;
     const imageWidth = rect.width;
     
-    // Left third of image = previous page
     if (clickX < imageWidth / 3) {
       if (typeof gtag !== 'undefined') {
         gtag('event', 'comic_navigation', {
@@ -228,7 +209,6 @@
       }
       goToPage(currentPage - 1);
     }
-    // Right third of image = next page
     else if (clickX > (imageWidth * 2) / 3) {
       if (typeof gtag !== 'undefined') {
         gtag('event', 'comic_navigation', {
@@ -241,13 +221,11 @@
       }
       goToPage(currentPage + 1);
     }
-    // Middle third does nothing (prevents accidental navigation)
   }
 
   // Share functionality
   function copyPageUrl() {
     navigator.clipboard.writeText(window.location.href);
-    // Show feedback
     const button = document.querySelector('[data-copy-button]');
     if (button) {
       const originalText = button.textContent;
@@ -395,13 +373,12 @@
         <p>by <span class="text-pink-400">{manga.seoData.primaryArtist}</span></p>
       {/if}
     </div>
-    <!-- Navigation hint -->
     <p class="text-gray-500 text-xs mt-3">
       💡 Click left/right sides of image to navigate • Use arrow keys
     </p>
   </header>
 
-  <!-- Share Section for Reading Pages -->
+  <!-- FIXED Share Section for Reading Pages -->
   <div class="bg-gray-900 border border-gray-700 rounded-lg p-4 mb-6 max-w-2xl mx-auto">
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
       <div>
@@ -422,7 +399,8 @@
           📋 Copy Page URL
         </button>
         
-        <div class="relative">
+        <!-- FIXED: Added data-share-container attribute -->
+        <div class="relative" data-share-container>
           <button
             on:click={() => showShareOptions = !showShareOptions}
             class="px-4 py-2 bg-pink-500 text-white rounded-lg hover:bg-pink-600 transition-colors text-sm font-medium"
@@ -473,7 +451,6 @@
           
           <!-- Click zones overlay (visible on hover) -->
           <div class="absolute inset-0 flex opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-            <!-- Left click zone -->
             {#if currentPage > 1}
               <div class="w-1/3 h-full flex items-center justify-start pl-4 bg-transparent rounded-l-lg">
                 <div class="bg-black bg-opacity-30 text-white px-2 py-1 rounded text-xs">
@@ -484,10 +461,8 @@
               <div class="w-1/3 h-full"></div>
             {/if}
             
-            <!-- Middle zone (no action) -->
             <div class="w-1/3 h-full"></div>
             
-            <!-- Right click zone -->
             {#if currentPage < totalPages}
               <div class="w-1/3 h-full flex items-center justify-end pr-4 bg-transparent rounded-r-lg">
                 <div class="bg-black bg-opacity-30 text-white px-2 py-1 rounded text-xs">
@@ -523,7 +498,7 @@
       </button>
     {/if}
 
-    <!-- Smart pagination - show first, last, and surrounding pages -->
+    <!-- Smart pagination -->
     {#each Array(totalPages) as _, i}
       {#if i + 1 === 1 || i + 1 === totalPages || Math.abs(i + 1 - currentPage) <= 2}
         <button
@@ -554,7 +529,7 @@
     {/if}
   </nav>
 
-  <!-- Bottom navigation with better hierarchy -->
+  <!-- Bottom navigation -->
   <nav class="flex flex-col sm:flex-row items-center justify-center gap-4 mt-10 mb-8">
     <a
       href={`/hentai/${slug}`}
@@ -572,12 +547,10 @@
 
   <!-- Content sections with improved spacing -->
   <div class="space-y-12">
-    <!-- Ad placement with better spacing -->
     <div class="my-16">
       <AAdsMiddleBanner />
     </div>
     
-    <!-- Similar Manga Widget with improved spacing -->
     <section aria-label="Similar manga recommendations" class="mt-16">
       <SimilarManga 
         tagIds={manga.tagIds} 
@@ -585,43 +558,38 @@
       />
     </section>
 
-    <!-- Ad section with spacing -->
     <div class="mt-16">
       <AAdsBanner />
     </div>
     
-    <!-- Hot Now Widget with improved spacing -->
     <section aria-label="Popular manga" class="mt-16">
       <RandomPost comics={data.randomComics} />
     </section>
 
-    <!-- Final ad section -->
     <section aria-label="Advertisement" class="mt-16">
       <NativeAds />
     </section>
   </div>
 </main>
 
-<!-- Close share dropdown when clicking outside -->
+<!-- FIXED: Close share dropdown when clicking outside -->
 <svelte:window on:click={(e) => {
-  if (!e.target.closest('[data-share-container]')) {
+  const target = e.target as Element;
+  if (!target.closest('[data-share-container]')) {
     showShareOptions = false;
   }
 }} />
 
 <style>
-  /* Enhanced visual hierarchy */
   main {
     background: linear-gradient(135deg, #000000 0%, #000000 100%);
     min-height: 100vh;
   }
   
-  /* Smooth transitions for better UX */
   * {
     transition: all 0.2s ease;
   }
   
-  /* Focus styles for better accessibility */
   button:focus-visible,
   a:focus-visible {
     outline: 2px solid #ec4899;
